@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import urllib3
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 
