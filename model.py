@@ -20,7 +20,6 @@ class Products(db.Model):
     brand = db.Column(db.String(75), 
                          nullable=True)
     sephora_url = db.Column(db.String(75),)
-    ingredient_list = db.Column(db.String(500))
     stars = db.Column(db.String(75), 
                       nullable=True)
     price = db.Column(db.String(75), 
@@ -36,6 +35,27 @@ class Products(db.Model):
         """For easier id when printing"""
 
         return f"<Product product_id={product_id} pr_name={pr_name} brand={brand}>"
+
+
+class Product_Ingredients(db.Model):
+    """Ingredient list with synonyms"""
+
+    __tablename__ = "product_ingredients"
+
+    prod_ing_id = db.Column(db.Integer, 
+                            autoincrement=True, 
+                            primary_key=True)
+    product_id = db.Column(db.Integer, 
+                           db.ForeignKey("products.product_id"), 
+                           nullable=True)
+    ingredient_id = db.Column(db.Integer, 
+                              db.ForeignKey("ingredients.ingredient_id"), 
+                              nullable=True)
+
+    def __repr__(self):
+        """For easier id when printing"""
+
+        return f"<Product_Ingredients prod_ing_id={prod_ing_id}>"
 
 
 class Ingredients(db.Model):
@@ -73,9 +93,6 @@ class Canadian_Flags(db.Model):
     can_flag_id = db.Column(db.Integer, 
                            autoincrement=True, 
                            primary_key=True)
-    ingredient_id = db.Column(db.Integer, 
-                              db.ForeignKey("ingredients.ingredient_id"), 
-                              nullable=True)
     can_notes = db.Column(db.String(75))
     can_severity = db.Column(db.String(500), 
                          nullable=True)
@@ -94,9 +111,6 @@ class European_Flags(db.Model):
     euro_flag_id = db.Column(db.Integer, 
                            autoincrement=True, 
                            primary_key=True)
-    ingredient_id = db.Column(db.Integer, 
-                              db.ForeignKey("ingredients.ingredient_id"), 
-                              nullable=True)
     euro_notes = db.Column(db.String(75))
     euro_severity = db.Column(db.String(500), 
                          nullable=True)
@@ -115,9 +129,6 @@ class FDA_Flags(db.Model):
     fda_flag_id = db.Column(db.Integer, 
                            autoincrement=True, 
                            primary_key=True)
-    ingredient_id = db.Column(db.Integer, 
-                              db.ForeignKey("ingredients.ingredient_id"), 
-                              nullable=True)
     fda_notes = db.Column(db.String(75))
     fda_severity = db.Column(db.String(500), 
                          nullable=True)
@@ -126,6 +137,24 @@ class FDA_Flags(db.Model):
         """For easier id when printing"""
 
         return f"<FDA Flag severity={fda_severity}>"
+
+
+def connect_to_db(app):
+    """Connect database to Flask app"""
+
+    # Configuring for PostgreSQL db
+    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://skincare"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    db.app = app
+    db.init_app(app)
+
+
+if __name__ == "__main__":
+    """Allows you to work with db directly when you run in interactive mode"""
+
+    from server import app
+    connect_to_db(app)
+    print("Connected to db")
 
 
 
