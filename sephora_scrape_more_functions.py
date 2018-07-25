@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 # import urllib3
 import requests
 # from urllib3.exceptions import HTTPError
-from urllib import urlopen
+from urllib.request import Request, urlopen
 
 
 def getting_urls_from_sitemap(doc="products-sitemap.xml", tag_name="loc"):
@@ -53,9 +53,11 @@ def make_sephora_page_soup():
             print(counter)
             for url in urls:
                 url = str(url)
+                print(type(url))
+                print(url)
                 # providing headers for client, otherwise request fails
                 # http = urllib3.PoolManager()
-                header = {"User-Agent":"Mozilla/5.0"}
+                header = {"User-Agent":"Firefox"}
                 request = Request(url, headers=header)
                 try:
                     page = urlopen(request)

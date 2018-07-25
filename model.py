@@ -1,9 +1,9 @@
 """Models and database functions"""
 
-from flask_sqlalchemy import SQLALchemy
+from flask_sqlalchemy import SQLAlchemy
 
 
-db = SQLALchemy()
+db = SQLAlchemy()
 
 
 # table definitions:
@@ -19,7 +19,7 @@ class Product(db.Model):
     pr_name = db.Column(db.String(75))
     brand = db.Column(db.String(75), 
                          nullable=True)
-    sephora_url = db.Column(db.String(75),)
+    sephora_url = db.Column(db.String(75))
     stars = db.Column(db.String(75), 
                       nullable=True)
     price = db.Column(db.String(75), 
@@ -27,9 +27,9 @@ class Product(db.Model):
     category_1 = db.Column(db.String(25))
     category_2 = db.Column(db.String(25), 
                            nullable=True)
-    category_3 = db.Column(db.Column(db.String(25), 
+    category_3 = db.Column(db.String(25), 
                            nullable=True)
-    ingredients = db.Column(db.String(1000),)
+    ingredients = db.Column(db.String(1000))
 
 
     def __repr__(self):
@@ -94,6 +94,8 @@ class Pregnancy_Flag(db.Model):
     preg_flag_id = db.Column(db.Integer, 
                            autoincrement=True, 
                            primary_key=True)
+    preg_flag_name = db.Column(db.String(150))
+    synonyms = db.Column(db.String(400))
     preg_notes = db.Column(db.String(500), 
                          nullable=True)
 
