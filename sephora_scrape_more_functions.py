@@ -54,10 +54,11 @@ def make_sephora_page_soup():
                 url = str(url)
                 # providing headers for client, otherwise request fails
                 http = urllib3.PoolManager()
-                header = {"User-Agent": "Human"}
+                header = {"User-Agent":"Mozilla/5.0"}
                 request = requests.get(url, headers=header)
                 try:
                     page = request.text
+                    print(page)
                 except HTTPError:
                     # only found one url that errored out this way and it was not relevant to project so skipping it
                     faulty_urls.append(url)
@@ -79,6 +80,7 @@ def make_sephora_page_soup():
                                 pass
                             else:
                                 valid_skincare_urls.append(url)
+                                print(url)
                                 valid_skin_urls.write(url+"\n")
         
     # writing urls to seperate files:
@@ -101,99 +103,40 @@ def make_sephora_page_soup():
 
 make_sephora_page_soup()
 
-# code for getting category information from soups
-# category_3 = soup.find(attrs={"class": "css-j60h5s"}).string
-# category_1 = categories_1_2[0].string
-# if category_1 != "Skincare":
-#     pass
-# else:
-#     if len(categories_1_2) > 1:
-#         category_2 = categories_1_2[1].string
-#     else:
-#         category_2 = "No information available"  
+# def scrape_relevant_product_info(doc="valid_skincare_urls.txt"):
+#     """Reads valid skincare product urls from external file and scrapes for relevant data"""
 
-
-
-# def remove_inactive_pages():
-#     """Removes inactive pages"""
-
-#     sephora_soups_all = make_sephora_page_soup()
-
-#     active_soups = []
-
-#     for soup in sephora_soups_all:
+#     with open(doc) as valid_skincare_urls:
+#         urls = valid_skincare_urls.readlines()
+    
+#     for url in urls:
+#         url = str(url)
+#         # providing headers for client, otherwise request fails
+#         http = urllib3.PoolManager()
+#         header = {"User-Agent": "Human"}
+#         request = requests.get(url, headers=header)
+#         page = request.text
+#         soup = BeautifulSoup(page, "html.parser")
 #         product_name = soup.find(attrs={"class": "css-1g2jq23"})
-#         if product_name == None:
-#             print("pass")
-#             pass
-#         else:
-#             active_soups.append(soup)
-#             print(product_name)
-
-#     return active_soups
-
-# remove_inactive_pages()
-
-def seperate_faulty_soups():
-    """Seperates faulty soups for further inpection"""
-
-    active_soups = remove_inactive_pages()
-
-    faulty_soups = []
-    valid_soups = []
-
-    for soup in active_soups:
-        category_info_check = soup.find_all(attrs={"class": "css-u2mtre"})
-        categories_1_2 = soup.find_all(attrs={"class": "css-u2mtre"})
-        if categories_1_2 == []:
-            faulty_soups.append(soup)
-        else:
-            valid_soups.append(soup)
-
-    print(len(valid_soups))
-    print(len(faulty_soups))
-    return valid_soups, faulty_soups
-
-
-# all_urls = getting_urls_from_sitemap()
-
-
-
-
-# # def parse_sephora_soups():
-# #     """Parses non-faulty soup objects to extract information for Products Class"""
-
-# #     product_info = {}
-# #     # getting product name from page and excluding pages that are no longer active
-# #     product_name = soup.find(attrs={"class": "css-1g2jq23"})
-
-# #     product_info[url] = []
-# #     # getting brand information from page and creating tuple for uniqueness
-# #     brand = soup.find(attrs={"class": "css-cjz2sh"}).string
-# #     # getting star rating as percentage
-# #     stars_object = soup.find(attrs={"class": "css-dtomnp"})
-#     stars = float(stars_object["style"].strip("%").split(":")[-1])
-#     # getting price from sephora page
-#     price_string = soup.find(attrs={"class": "css-18suhml"}).string
-#     if price_string == None:
-#         price = 0
-#     else:
-#         price = float(price_string.strip("$"))
-#     # getting product categories from page
-#     categories_1_2 = soup.find_all(attrs={"class": "css-u2mtre"})
-#     if categories_1_2 == []:
-#         category_1 = "No information available"
-#         category_2 = "No information available"
-#         category_3 = "No information available"
-#     else:
-#         category_3 = soup.find(attrs={"class": "css-j60h5s"}).string
-#         category_1 = categories_1_2[0].string
+#         categories_1_2 = soup.find_all(attrs={"class": "css-u2mtre"})
+#         category_1 = category_1 = categories_1_2[0].string
 #         if len(categories_1_2) > 1:
 #             category_2 = categories_1_2[1].string
 #         else:
-#             category_2 = "No information available"
+#             category_2 = None
+#         category_3 = category_3 = soup.find(attrs={"class": "css-j60h5s"}).string
+#         # getting brand name
+#         brand = soup.find(attrs={"class": "css-cjz2sh"}).string
+#         # getting star rating as percentage
+#         stars_object = soup.find(attrs={"class": "css-dtomnp"})
+#         stars = float(stars_object["style"].strip("%").split(":")[-1])
+#         # getting price from sephora page
+#         price_string = soup.find(attrs={"class": "css-18suhml"}).string
+#         if price_string == None:
+#             price = 0
+#         else:
+#             price = float(price_string.strip("$"))
     
-#     print(category_1, category_2)
 
 
 

@@ -29,6 +29,7 @@ class Product(db.Model):
                            nullable=True)
     category_3 = db.Column(db.Column(db.String(25), 
                            nullable=True)
+    ingredients = db.Column(db.String(1000),)
 
 
     def __repr__(self):
@@ -85,58 +86,38 @@ class Ingredient(db.Model):
         return f"<Ingredient ingredient_id={ingredient_id} ing_name={pr_name}>"
 
 
-class Canadian_Flag(db.Model):
+class Pregnancy_Flag(db.Model):
     """Canadian ingredient flags and notes"""
 
-    __tablename__ = "canadian_flags"
+    __tablename__ = "pregnancy_flags"
 
-    can_flag_id = db.Column(db.Integer, 
+    preg_flag_id = db.Column(db.Integer, 
                            autoincrement=True, 
                            primary_key=True)
-    can_notes = db.Column(db.String(75))
-    can_severity = db.Column(db.String(500), 
+    preg_notes = db.Column(db.String(500), 
                          nullable=True)
 
     def __repr__(self):
         """For easier id when printing"""
 
-        return f"<Canadian Flag severity={can_severity}>"
+        return f"<Pregnancy Flag notes={preg_notes}>"
 
 
-class European_Flag(db.Model):
-    """European ingredient flags and notes"""
+class Sensitive_Flag(db.Model):
+    """Canadian ingredient flags and notes"""
 
-    __tablename__ = "european_flags"
+    __tablename__ = "sensitive_flags"
 
-    euro_flag_id = db.Column(db.Integer, 
+    sens_flag_id = db.Column(db.Integer, 
                            autoincrement=True, 
                            primary_key=True)
-    euro_notes = db.Column(db.String(75))
-    euro_severity = db.Column(db.String(500), 
+    sens_notes = db.Column(db.String(500), 
                          nullable=True)
 
     def __repr__(self):
         """For easier id when printing"""
 
-        return f"<European Flag severity={euro_severity}>"
-
-
-class FDA_Flag(db.Model):
-    """FDA ingredient flags and notes"""
-
-    __tablename__ = "fda_flags"
-
-    fda_flag_id = db.Column(db.Integer, 
-                           autoincrement=True, 
-                           primary_key=True)
-    fda_notes = db.Column(db.String(75))
-    fda_severity = db.Column(db.String(500), 
-                         nullable=True)
-
-    def __repr__(self):
-        """For easier id when printing"""
-
-        return f"<FDA Flag severity={fda_severity}>"
+        return f"<Sensitive Flag notes={sens_notes}>"
 
 
 def connect_to_db(app):
