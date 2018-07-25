@@ -12,6 +12,7 @@ Jinja2==2.10
 lxml==4.2.3
 MarkupSafe==1.0
 pkg-resources==0.0.0
+psycopg2==2.7.5
 requests==2.19.1
 SQLAlchemy==1.2.10
 urllib3==1.23

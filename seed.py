@@ -1,9 +1,9 @@
 """Seeds skincare database from csv and txt files"""
 
 from sqlalchemy import func
-from model import Product, Product_Ingredient, Ingredient, Pregnancy_Flag, Sensitive_Flag
+from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, Pregnancy_Flag, Sensitive_Flag
 from server import app
-from sephora_scrape_more_functions import scrape_relevant_product_info
+# from sephora_scrape import scrape_relevant_product_info
 
 def load_products(doc="products.csv"):
     """Loads product data from Sephora scrape"""
@@ -27,12 +27,12 @@ def load_products(doc="products.csv"):
     db.session.commit()
 
 
-def load_pregnancy_flags(doc="pregnancy_flags.csv"):
+def load_pregnancy_flags(doc):
     """Loads product data from Sephora scrape"""
 
     for i, row in enumerate(open(doc)):
         row = row.rstrip()
-        preg_flag_name, synonyms, preg_notes = row.split(",")
+        preg_flag_name, synonyms, preg_notes = row.split("|")
 
         pregnancy_flag = Pregnancy_Flag(preg_flag_name=preg_flag_name, 
                                         synonyms=synonyms, 
@@ -47,8 +47,8 @@ if __name__ == "__main__":
     connect_to_db(app)
     db.create_all()
 
-    preg_flag_filename = "seed_data/u.item"
-    load_pregnancy_flags(user_filename)
+    preg_filename = "seed_data/preg_flag"
+    load_pregnancy_flags(preg_filename)
 
 
 

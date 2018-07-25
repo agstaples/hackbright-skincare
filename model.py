@@ -70,14 +70,11 @@ class Ingredient(db.Model):
     ing_name = db.Column(db.String(75))
     synonyms = db.Column(db.String(500), 
                          nullable=True)
-    euro_flag_id = db.Column(db.Integer, 
-                             db.ForeignKey("euro_flags.euro_flag_id"), 
+    preg_flag_id = db.Column(db.Integer, 
+                             db.ForeignKey("pregnancy_flags.preg_flag_id"), 
                              nullable=True)
-    can_flag_id = db.Column(db.Integer, 
-                            db.ForeignKey("can_flags.can_flag_id"), 
-                            nullable=True)
-    fda_flag_id = db.Column(db.Integer, 
-                            db.ForeignKey("fda_flags.fda_flag_id"), 
+    sens_flag_id = db.Column(db.Integer, 
+                            db.ForeignKey("sensitive_flags.sens_flag_id"), 
                             nullable=True)
 
     def __repr__(self):
@@ -126,7 +123,7 @@ def connect_to_db(app):
     """Connect database to Flask app"""
 
     # Configuring for PostgreSQL db
-    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://skincare"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///skincare"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
     db.init_app(app)
