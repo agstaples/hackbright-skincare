@@ -1,9 +1,10 @@
 # tried to run this and it ran for 20 minutes and then just said KILLED
 
 from bs4 import BeautifulSoup
-import urllib3
+# import urllib3
 import requests
-from urllib3.exceptions import HTTPError
+# from urllib3.exceptions import HTTPError
+from urllib import urlopen
 
 
 def getting_urls_from_sitemap(doc="products-sitemap.xml", tag_name="loc"):
@@ -53,11 +54,11 @@ def make_sephora_page_soup():
             for url in urls:
                 url = str(url)
                 # providing headers for client, otherwise request fails
-                http = urllib3.PoolManager()
+                # http = urllib3.PoolManager()
                 header = {"User-Agent":"Mozilla/5.0"}
-                request = requests.get(url, headers=header)
+                request = Request(url, headers=header)
                 try:
-                    page = request.text
+                    page = urlopen(request)
                     print(page)
                 except HTTPError:
                     # only found one url that errored out this way and it was not relevant to project so skipping it
