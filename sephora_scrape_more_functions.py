@@ -22,51 +22,82 @@ def getting_urls_from_sitemap(doc="products-sitemap.xml", tag_name="loc"):
     # with open("sephora_all_urls.data", "w") as all_urls_data:
     #     for url in urls:
     #         url = url.string
-    #         all_urls_data.write(url)
+    #         all_urls_data.write(url+"\n")
 
     return all_urls
 
 
+def divide_url_list():
+    """Divides full list of urls into smaller lists for processing to avoid runtime errors"""
+    
+    all_urls = getting_urls_from_sitemap()
+
+    # returns full list broken into chunks of 100 urls or fewer
+    return [all_urls[x:x+100] for x in range(0, len(all_urls), 100)]
+    
+
 def make_sephora_page_soup():
     """Makes soup objects out of Sephora urls"""
 
-    urls = getting_urls_from_sitemap()
+    split_urls = divide_url_list()
+    print(len(split_urls))
     valid_skincare_urls = []
     valid_nonskincare_urls = []
     faulty_urls = []
+    counter = 0
 
-    for url in urls:
-        url = str(url)
-        # providing headers for client, otherwise request fails
-        http = urllib3.PoolManager()
-        header = {"User-Agent": "Human"}
-        request = requests.get(url, headers=header)
-        try:
-            page = request.text
-        except HTTPError:
-            # only found one url that errored out this way and it was not relevant to project so skipping it
-            faulty_urls.append(url)
-            pass
-        else:
-            soup = BeautifulSoup(page, "html.parser")
-            product_name = soup.find(attrs={"class": "css-1g2jq23"})
-            if product_name == None:
-                faulty_urls.append(url)
-                pass
-            else:
-                categories_1_2 = soup.find_all(attrs={"class": "css-u2mtre"})
-                if categories_1_2 == []:
-                    faulty_urls.append(soup)
+    with open("valid_skincare_urls.txt", "w") as valid_skin_urls:
+        for urls in split_urls:
+            counter += 1
+            print(counter)
+            for url in urls:
+                url = str(url)
+                # providing headers for client, otherwise request fails
+                http = urllib3.PoolManager()
+                header = {"User-Agent": "Human"}
+                request = requests.get(url, headers=header)
+                try:
+                    page = request.text
+                except HTTPError:
+                    # only found one url that errored out this way and it was not relevant to project so skipping it
+                    faulty_urls.append(url)
+                    pass
                 else:
-                    category_1 = categories_1_2[0].string
-                    if category_1 != "Skincare":
-                        valid_nonskincare_urls.append(url)
+                    soup = BeautifulSoup(page, "html.parser")
+                    product_name = soup.find(attrs={"class": "css-1g2jq23"})
+                    if product_name == None:
+                        faulty_urls.append(url)
                         pass
                     else:
-                        valid_skincare_urls.append(url)
-                        print(url)
+                        categories_1_2 = soup.find_all(attrs={"class": "css-u2mtre"})
+                        if categories_1_2 == []:
+                            faulty_urls.append(soup)
+                        else:
+                            category_1 = categories_1_2[0].string
+                            if category_1 != "Skincare":
+                                valid_nonskincare_urls.append(url)
+                                pass
+                            else:
+                                valid_skincare_urls.append(url)
+                                valid_skin_urls.write(url+"\n")
+        
+    # writing urls to seperate files:
+    # with open("valid_skincare_urls.txt", "w") as valid_skin_urls:
+    #     for url in valid_skincare_urls:
+    #         # url = url.string
+    #         valid_skin_urls.write(url+"\n")
 
-    return valid_skincare_urls
+    # with open("faulty_urls.txt", "w") as faulty_urls_page:
+    #     for url in faulty_urls:
+    #         # url = url.string
+    #         faulty_urls_page.write(url+"\n")
+
+    # with open("valid_nonskincare_urls.txt", "w") as nonskin_urls:
+    #     for url in valid_nonskincare_urls:
+    #         # url = url.string
+    #         nonskin_urls.write(url+"\n")
+
+    return len(valid_skincare_urls), len(faulty_urls), len(valid_nonskincare_urls)
 
 make_sephora_page_soup()
 

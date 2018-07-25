@@ -8,7 +8,7 @@ db = SQLALchemy()
 
 # table definitions:
 
-class Products(db.Model):
+class Product(db.Model):
     """Sephora product info and ingredients list"""
 
     __tablename__ = "products"
@@ -37,7 +37,7 @@ class Products(db.Model):
         return f"<Product product_id={product_id} pr_name={pr_name} brand={brand}>"
 
 
-class Product_Ingredients(db.Model):
+class Product_Ingredient(db.Model):
     """Ingredient list with synonyms"""
 
     __tablename__ = "product_ingredients"
@@ -58,7 +58,7 @@ class Product_Ingredients(db.Model):
         return f"<Product_Ingredients prod_ing_id={prod_ing_id}>"
 
 
-class Ingredients(db.Model):
+class Ingredient(db.Model):
     """Ingredient list with synonyms"""
 
     __tablename__ = "ingredients"
@@ -85,7 +85,7 @@ class Ingredients(db.Model):
         return f"<Ingredient ingredient_id={ingredient_id} ing_name={pr_name}>"
 
 
-class Canadian_Flags(db.Model):
+class Canadian_Flag(db.Model):
     """Canadian ingredient flags and notes"""
 
     __tablename__ = "canadian_flags"
@@ -103,7 +103,7 @@ class Canadian_Flags(db.Model):
         return f"<Canadian Flag severity={can_severity}>"
 
 
-class European_Flags(db.Model):
+class European_Flag(db.Model):
     """European ingredient flags and notes"""
 
     __tablename__ = "european_flags"
@@ -121,7 +121,7 @@ class European_Flags(db.Model):
         return f"<European Flag severity={euro_severity}>"
 
 
-class FDA_Flags(db.Model):
+class FDA_Flag(db.Model):
     """FDA ingredient flags and notes"""
 
     __tablename__ = "fda_flags"
