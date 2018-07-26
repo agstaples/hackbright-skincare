@@ -32,11 +32,11 @@ def load_pregnancy_flags(doc):
 
     for i, row in enumerate(open(doc)):
         row = row.rstrip()
-        preg_flag_name, synonyms, preg_notes = row.split("|")
+        preg_flag_name, other_names, ewg_score = row.split("|")
 
         pregnancy_flag = Pregnancy_Flag(preg_flag_name=preg_flag_name, 
-                                        synonyms=synonyms, 
-                                        preg_notes=preg_notes)
+                                        other_names=other_names, 
+                                        ewg_preg_score=ewg_score)
 
         db.session.add(pregnancy_flag)
 

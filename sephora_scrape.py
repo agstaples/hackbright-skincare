@@ -55,25 +55,25 @@ def make_sephora_page_soup():
                 # http = urllib3.PoolManager()
                 header = {"User-Agent":"Firefox"}
                 request = Request(url, headers=header)
-                try:
-                    page = urlopen(request)
-                except HTTPError:
+                # try:
+                page = urlopen(request)
+                # except HTTPError:
+                #     pass
+                # else:
+                soup = BeautifulSoup(page, "html.parser")
+                product_name = soup.find(attrs={"class": "css-1g2jq23"})
+                if product_name == None:
                     pass
                 else:
-                    soup = BeautifulSoup(page, "html.parser")
-                    product_name = soup.find(attrs={"class": "css-1g2jq23"})
-                    if product_name == None:
+                    categories_1_2 = soup.find_all(attrs={"class": "css-u2mtre"})
+                    if categories_1_2 == []:
                         pass
                     else:
-                        categories_1_2 = soup.find_all(attrs={"class": "css-u2mtre"})
-                        if categories_1_2 == []:
-                            pass
-                        else:
-                            category_1 = categories_1_2[0].string
-                            if category_1 == "Skincare":
-                                valid_skincare_urls.append(url)
-                                print(url)
-                                valid_skin_urls.write(url+"\n")
+                        category_1 = categories_1_2[0].string
+                        if category_1 == "Skincare":
+                            valid_skincare_urls.append(url)
+                            print(url)
+                            valid_skin_urls.write(url+"\n")
 
     return len(valid_skincare_urls), len(faulty_urls), len(valid_nonskincare_urls)
 

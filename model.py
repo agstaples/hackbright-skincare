@@ -92,8 +92,8 @@ class Pregnancy_Flag(db.Model):
                            autoincrement=True, 
                            primary_key=True)
     preg_flag_name = db.Column(db.String(150))
-    synonyms = db.Column(db.String(400))
-    preg_notes = db.Column(db.String(500), 
+    other_names = db.Column(db.String(400))
+    ewg_preg_score = db.Column(db.Integer, 
                          nullable=True)
 
     def __repr__(self):
