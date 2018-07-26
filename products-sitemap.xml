@@ -63896,12 +63896,6 @@ xmlns:xhtml="http://www.w3.org/1999/xhtml">
 		<xhtml:link rel="alternate" media="only screen and (max-width: 640px)" href="https://m.sephora.com/product/invictus-gift-set-P430181" />
 	</url>
 	<url>
-		<loc>https://www.sephora.com/product/restore-kit-P430182</loc>
-		<changefreq>daily</changefreq>
-		<priority>0.5</priority>
-		<xhtml:link rel="alternate" media="only screen and (max-width: 640px)" href="https://m.sephora.com/product/restore-kit-P430182" />
-	</url>
-	<url>
 		<loc>https://www.sephora.com/product/opus-liquid-lip-mythic-moon-P430211</loc>
 		<changefreq>daily</changefreq>
 		<priority>0.5</priority>
