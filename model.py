@@ -80,20 +80,15 @@ class User(db.Model):
                            autoincrement=True, 
                            primary_key=True)
     fname = db.Column(db.String(100))
-    lname = db.Column(db.String(100))
     email = db.Column(db.String(75))
     password = db.Column(db.String(100))
-    age = db.Column(db.Integer, 
-                    nullable=True)
-    m_f = db.Column(db.String(25), 
-                    nullable=True)
     concerns = db.Column(db.String(1000), 
                     nullable=True)
 
     def __repr__(self):
         """For easier id when printing"""
 
-        return f"<User name={fname} {lname}>"
+        return f"<User name={fname}>"
 
 
 
@@ -175,25 +170,5 @@ if __name__ == "__main__":
     from server import app
     connect_to_db(app)
     print("Connected to db")
-
-
-
-
-
-
-    category_1 = db.Column(db.String(75))
-    category_2 = db.Column(db.String(75), 
-                           nullable=True)
-    category_3 = db.Column(db.String(75), 
-                           nullable=True)
-
-
-
-
-
-
-
-
-
 
 

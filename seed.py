@@ -1,7 +1,7 @@
 """Seeds skincare database from csv and txt files"""
 
 from sqlalchemy import func
-from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, Pregnancy_Flag, Sensitive_Flag
+from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, Category
 from server import app
 import os
 # from sephora_scrape import scrape_relevant_product_info
@@ -54,25 +54,6 @@ def load_product_ingredients(doc):
     db.session.commit()
 
 
-def load_users(doc):
-    """Loads user data"""
-
-    for i, row in enumerate(open(doc)):
-        row = row.rstrip()
-        fname, lname, email, password, m_f, concerns = row.split("|")
-
-        user = User(fname=fname, 
-                    lname=lname, 
-                    email=email, 
-                    password=password, 
-                    m_f=m_f, 
-                    concerns=concerns)
-
-        db.session.add(user)
-
-    db.session.commit()
-
-
 def load_flags(doc):
     """Loads flag data"""
 
@@ -97,7 +78,7 @@ def load_ingredient_flags(doc):
         row = row.rstrip()
         ingredient_id, flag_id = row.split("|")
 
-        ingredient_flag = Ingredient_flag(ingredient_id=ingredient_id, 
+        ingredient_flag = Ingredient_Flag(ingredient_id=ingredient_id, 
                                           flag_id=flag_id)
 
         db.session.add(ingredient_flag)
