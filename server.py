@@ -18,6 +18,51 @@ app.secret_key = "ABC"
 app.jinja_env.undefined = StrictUndefined
 
 
+@app.route("/")
+def homepage():
+    """Renders homepage"""
+
+    return render_template("homepage.html")
+
+
+@app.route("/register")
+def show_registration_form():
+    """Registration form for new users"""
+
+
+@app.route("/register", methods=["POST"])
+def process_registration():
+    """Processes registration form for new users"""
+
+
+@app.route("/login")
+def show_login_form():
+    """Log in form for exisiting users"""
+
+
+@app.route("/login")
+def process_login():
+    """Processes login form for existing users"""
+
+
+@app.route("/logout")
+def logout():
+    """Logs out user"""
+
+
+@app.route("/search")
+def show_product_search():
+    """shows main search page"""
+
+
+@app.route("/search", methods=["POST"])
+def process_product_search():
+    """Processes search"""
+
+
+
+
+
 
 
 
