@@ -13,6 +13,10 @@ with open("valid_skincare_urls_1-28.txt", "r") as urls:
 
     with open("valid_skin_urls.txt", "w") as dedup_urls:
         for line in lines_list:
-            dedup_urls.write(line+"\n")        
+            dedup_urls.write(line+"\n")   
+
+
+
+  
 
     

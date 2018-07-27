@@ -3,23 +3,24 @@
 from sqlalchemy import func
 from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, Pregnancy_Flag, Sensitive_Flag
 from server import app
+import os
 # from sephora_scrape import scrape_relevant_product_info
 
-def load_products(doc="products.csv"):
+def load_products():
     """Loads product data from Sephora scrape"""
 
-    product_details = scrape_relevant_product_info()
-
-    for key, value in product_details.items():
-        pr_name, brand, sephora_url, stars, price, cat_1, cat_2, cat_3, ing = value.split()
-        product = Product(pr_name=pr_name, 
-                          brand=brand, 
-                          sephora_url=sephora_url, 
-                          stars=stars, 
-                          price=price, 
+    for i in range(840):
+        f = open(f"test_text/{i+1}", "r")
+        text = f.readlines()
+        url, pr_name, cat_1, cat_2, cat_3, brand, stars, price, ing = text[0].split("|")
+        product = Product(sephora_url=url, 
+                          pr_name=pr_name, 
                           category_1=cat_1, 
                           category_2=cat_2, 
                           category_3=cat_3, 
+                          brand=brand, 
+                          stars=stars, 
+                          price=price, 
                           ingredients=ing)
 
         db.session.add(product)
@@ -47,8 +48,11 @@ if __name__ == "__main__":
     connect_to_db(app)
     db.create_all()
 
-    preg_filename = "seed_data/preg_flag"
-    load_pregnancy_flags(preg_filename)
+
+    load_products()
+    # preg_filename = "seed_data/preg_flag"
+    # load_pregnancy_flags(preg_filename)
+
 
 
 

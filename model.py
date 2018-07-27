@@ -16,20 +16,20 @@ class Product(db.Model):
     product_id = db.Column(db.Integer, 
                            autoincrement=True, 
                            primary_key=True)
-    pr_name = db.Column(db.String(75))
-    brand = db.Column(db.String(75), 
+    pr_name = db.Column(db.String(1000))
+    brand = db.Column(db.String(1000), 
                          nullable=True)
-    sephora_url = db.Column(db.String(75))
+    sephora_url = db.Column(db.String(1000))
     stars = db.Column(db.String(75), 
                       nullable=True)
     price = db.Column(db.String(75), 
                       nullable=True)
-    category_1 = db.Column(db.String(25))
-    category_2 = db.Column(db.String(25), 
+    category_1 = db.Column(db.String(75))
+    category_2 = db.Column(db.String(75), 
                            nullable=True)
-    category_3 = db.Column(db.String(25), 
+    category_3 = db.Column(db.String(75), 
                            nullable=True)
-    ingredients = db.Column(db.String(1000))
+    ingredients = db.Column(db.String(50000))
 
 
     def __repr__(self):

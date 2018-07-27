@@ -81,10 +81,12 @@ def make_sephora_page_soup():
 def scrape_relevant_product_info(doc="valid_skin_urls.txt"):
     """Reads valid skincare product urls from external file and scrapes for relevant data"""
 
+    counter = 0
+
     with open(doc) as valid_skin_urls:
         urls = valid_skin_urls.readlines()
-    
-        for url in urls[:5]:
+        for url in urls:
+            counter += 1
             url = str(url.rstrip())
             # providing headers for client, otherwise request fails
             header = {"User-Agent":"Firefox"}
@@ -100,19 +102,19 @@ def scrape_relevant_product_info(doc="valid_skin_urls.txt"):
             if len(categories_1_2) > 1:
                 category_2 = categories_1_2[1].string
             else:
-                category_2 = None
+                category_2 = ""
             category_3 = category_3 = soup.find(attrs={"class": "css-j60h5s"}).string
             # getting brand name
             brand = soup.find(attrs={"class": "css-cjz2sh"}).string
             # getting star rating as percentage
             stars_object = soup.find(attrs={"class": "css-dtomnp"})
-            stars = float(stars_object["style"].strip("%").split(":")[-1])
+            stars = str(stars_object["style"].strip("%").split(":")[-1])
             # getting price from sephora page
             price_string = soup.find(attrs={"class": "css-18suhml"}).string
             if price_string == None:
-                price = 0
+                price = str(0)
             else:
-                price = float(price_string.strip("$"))
+                price = str(price_string.strip("$"))
             product_box = soup.find_all(attrs={'class': 'css-1juot2r'})
             ingredients_all = product_box[-1].text
             ingredients_list = ingredients_all.split("\n")
@@ -120,8 +122,9 @@ def scrape_relevant_product_info(doc="valid_skin_urls.txt"):
                 ingredients = ingredients_list[-2].rstrip(".")
             else:
                 ingredients = ingredients_list[-1].rstrip(".")
-
-
+            print(counter)
+            file = open(f"test_text/{counter}", "w")
+            file.write(url+"|"+name+"|"+category_1+"|"+category_2+"|"+category_3+"|"+brand+"|"+stars+"|"+price+"|"+ingredients)
 
 
 scrape_relevant_product_info()  
@@ -129,13 +132,6 @@ scrape_relevant_product_info()
 
 
 
-
-
-
-        # product_box = soup.find_all(attrs={'class': 'css-1juot2r'})
-        # print(product_box)
-
-        # ingredients = str(product_box[-1]).strip('.</div>').split("<br/><br/>")[-1]
 
 
 
