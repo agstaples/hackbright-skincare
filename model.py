@@ -20,22 +20,34 @@ class Product(db.Model):
     brand = db.Column(db.String(1000), 
                          nullable=True)
     sephora_url = db.Column(db.String(1000))
-    stars = db.Column(db.String(75), 
+    stars = db.Column(db.Integer, 
                       nullable=True)
-    price = db.Column(db.String(75), 
+    price = db.Column(db.Integer, 
                       nullable=True)
-    category_1 = db.Column(db.String(75))
-    category_2 = db.Column(db.String(75), 
-                           nullable=True)
-    category_3 = db.Column(db.String(75), 
-                           nullable=True)
-    ingredients = db.Column(db.String(50000))
 
 
     def __repr__(self):
         """For easier id when printing"""
 
         return f"<Product product_id={product_id} pr_name={pr_name} brand={brand}>"
+
+
+class Ingredient(db.Model):
+    """Ingredient list with synonyms"""
+
+    __tablename__ = "ingredients"
+
+    ingredient_id = db.Column(db.Integer, 
+                           autoincrement=True, 
+                           primary_key=True)
+    ing_name = db.Column(db.String(75))
+    synonym = db.Column(db.String(200), 
+                         nullable=True)
+
+    def __repr__(self):
+        """For easier id when printing"""
+
+        return f"<Ingredient ingredient_id={ingredient_id} ing_name={pr_name}>"
 
 
 class Product_Ingredient(db.Model):
@@ -59,64 +71,92 @@ class Product_Ingredient(db.Model):
         return f"<Product_Ingredients prod_ing_id={prod_ing_id}>"
 
 
-class Ingredient(db.Model):
-    """Ingredient list with synonyms"""
+class User(db.Model):
+    """Canadian ingredient flags and notes"""
 
-    __tablename__ = "ingredients"
+    __tablename__ = "users"
 
+    user_id = db.Column(db.Integer, 
+                           autoincrement=True, 
+                           primary_key=True)
+    fname = db.Column(db.String(100))
+    lname = db.Column(db.String(100))
+    email = db.Column(db.String(75))
+    password = db.Column(db.String(100))
+    age = db.Column(db.Integer, 
+                    nullable=True)
+    m_f = db.Column(db.String(25), 
+                    nullable=True)
+    concerns = db.Column(db.String(1000), 
+                    nullable=True)
+
+    def __repr__(self):
+        """For easier id when printing"""
+
+        return f"<User name={fname} {lname}>"
+
+
+
+class Flag(db.Model):
+    """Canadian ingredient flags and notes"""
+
+    __tablename__ = "flags"
+
+    flag_id = db.Column(db.Integer, 
+                           autoincrement=True, 
+                           primary_key=True)
+    name = db.Column(db.String(150))
+    description = db.Column(db.String(400))
+    citation = db.Column(db.String(400))
+    user_id = db.Column(db.Integer, 
+                        db.ForeignKey("users.user_id"), 
+                        nullable=True)
+
+    def __repr__(self):
+        """For easier id when printing"""
+
+        return f"<Flag name={name}>"
+
+
+class Ingredient_Flag(db.Model):
+    """Canadian ingredient flags and notes"""
+
+    __tablename__ = "ingredient_flags"
+
+    ing_flag_id = db.Column(db.Integer, 
+                           autoincrement=True, 
+                           primary_key=True)
     ingredient_id = db.Column(db.Integer, 
-                           autoincrement=True, 
-                           primary_key=True)
-    ing_name = db.Column(db.String(75))
-    synonyms = db.Column(db.String(500), 
-                         nullable=True)
-    preg_flag_id = db.Column(db.Integer, 
-                             db.ForeignKey("pregnancy_flags.preg_flag_id"), 
-                             nullable=True)
-    sens_flag_id = db.Column(db.Integer, 
-                            db.ForeignKey("sensitive_flags.sens_flag_id"), 
-                            nullable=True)
+                        db.ForeignKey("ingredients.ingredient_id"))
+    flag_id = db.Column(db.Integer, 
+                        db.ForeignKey("flags.flag_id"))
 
     def __repr__(self):
         """For easier id when printing"""
 
-        return f"<Ingredient ingredient_id={ingredient_id} ing_name={pr_name}>"
+        return f"<Ingredient Flag ingredient flag={ing_flag_id}>"
 
 
-class Pregnancy_Flag(db.Model):
+class Product_Category(db.Model):
     """Canadian ingredient flags and notes"""
 
-    __tablename__ = "pregnancy_flags"
+    __tablename__ = "product_categories"
 
-    preg_flag_id = db.Column(db.Integer, 
+    category_id = db.Column(db.Integer, 
                            autoincrement=True, 
                            primary_key=True)
-    preg_flag_name = db.Column(db.String(150))
-    other_names = db.Column(db.String(400))
-    ewg_preg_score = db.Column(db.Integer, 
-                         nullable=True)
+    product_id = db.Column(db.Integer, 
+                        db.ForeignKey("products.product_id"))
+    broad = db.Column(db.String(50))
+    middle = db.Column(db.String(75), 
+                       nullable=True)
+    specific = db.Column(db.String(100), 
+                       nullable=True)
 
     def __repr__(self):
         """For easier id when printing"""
 
-        return f"<Pregnancy Flag notes={preg_notes}>"
-
-
-class Sensitive_Flag(db.Model):
-    """Canadian ingredient flags and notes"""
-
-    __tablename__ = "sensitive_flags"
-
-    sens_flag_id = db.Column(db.Integer, 
-                           autoincrement=True, 
-                           primary_key=True)
-    sens_notes = db.Column(db.String(500), 
-                         nullable=True)
-
-    def __repr__(self):
-        """For easier id when printing"""
-
-        return f"<Sensitive Flag notes={sens_notes}>"
+        return f"<Product Category category={broad}/{middle}/{specific}>"
 
 
 def connect_to_db(app):
@@ -140,6 +180,12 @@ if __name__ == "__main__":
 
 
 
+
+    category_1 = db.Column(db.String(75))
+    category_2 = db.Column(db.String(75), 
+                           nullable=True)
+    category_3 = db.Column(db.String(75), 
+                           nullable=True)
 
 
 
