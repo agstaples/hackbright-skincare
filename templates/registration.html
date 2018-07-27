@@ -1,0 +1,45 @@
+    # registration form for new users including:
+    # first name, email, password, age, m/f, concerns
+    # ideally registration could happen in pop up
+    # that user can swipe through without redirecting
+    # to new form page
+
+
+{% extends "base.html" %}
+{% block content %}
+
+    <h2>Create New Account</h2>
+
+    <form action="/register" method="POST">
+
+        <div>
+            <label>First Name:
+                <input type="text" name="fname" required>
+            </label>
+        </div>
+
+        <div>
+            <label>Email:
+                <input type="email" name="email" required>
+            </label>
+        </div>
+
+        <div>
+            <label>Password:
+                <input type="password" name="password" required>
+            </label>
+        </div>
+
+        <div>
+            <label>Email:
+                <input type="email" name="email" required>
+            </label>
+        </div>
+
+        <div>
+            <input type="submit" value="Log In">
+        </div>
+
+    </form>
+
+{% endblock %}

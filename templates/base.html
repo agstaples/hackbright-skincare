@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>sPYence</title>
+<!--     <link rel="stylesheet" href="...link to .css..." -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+</head>
+<body>
+
+<h1>sPYence</h1>
+
+{% if 'user_id' in session %}
+    <a href='/logout'>Logout</a>
+{% else %}
+    <a href='/login'>Login</a>
+{% endif %}
+
+{% for flash in get_flashed_messages() %}
+    {{ flash }}
+{% endfor %}
+
+{% block content %}
+
+BODY CONTENT GOES HERE
+
+{% endblock %}
+
+</body>
+</html>
