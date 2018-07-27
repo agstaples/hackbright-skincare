@@ -137,10 +137,10 @@ class Ingredient_Flag(db.Model):
         return f"<Ingredient Flag ingredient flag={ing_flag_id}>"
 
 
-class Product_Category(db.Model):
+class Category(db.Model):
     """Canadian ingredient flags and notes"""
 
-    __tablename__ = "product_categories"
+    __tablename__ = "categories"
 
     category_id = db.Column(db.Integer, 
                            autoincrement=True, 
@@ -156,7 +156,7 @@ class Product_Category(db.Model):
     def __repr__(self):
         """For easier id when printing"""
 
-        return f"<Product Category category={broad}/{middle}/{specific}>"
+        return f"<Category category={broad}/{middle}/{specific}>"
 
 
 def connect_to_db(app):
