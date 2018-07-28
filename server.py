@@ -36,24 +36,22 @@ def show_registration_form():
 def process_registration():
     """Loads new user data to database"""
 
-    fname = request.form
-    email = request.form
-    password = request.form
-    concerns = request.form
+    fname = request.form["fname"]
+    email = request.form["email"]
+    password = request.form["password"]
 
     if User.query.filter_by(email=email).first():
         flash("That email address already exists in our files, please login.")
         return redirect("/login")
     else:
-        user = User(fname=fname,  
+        user = User(fname=fname, 
                     email=email, 
-                    password=password, 
-                    concerns=concerns)
+                    password=password)
 
     db.session.add(user)
     db.session.commit()
 
-    flash("You're logged in. Let's get searching.")
+    flash("You successfully registered. Let's get searching.")
     return redirect("/search")
 
 

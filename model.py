@@ -82,8 +82,6 @@ class User(db.Model):
     fname = db.Column(db.String(100))
     email = db.Column(db.String(75))
     password = db.Column(db.String(100))
-    concerns = db.Column(db.String(1000), 
-                    nullable=True)
 
     def __repr__(self):
         """For easier id when printing"""

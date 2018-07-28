@@ -16,8 +16,8 @@ def load_products():
         product = Product(sephora_url=url, 
                           pr_name=pr_name, 
                           brand=brand, 
-                          stars=stars, 
-                          price=price)
+                          stars=float(stars), 
+                          price=float(price))
 
         db.session.add(product)
 
