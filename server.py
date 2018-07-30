@@ -7,6 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, Category
 
+from werkzeug.exceptions import BadRequestKeyError
 
 app = Flask(__name__)
 
@@ -100,40 +101,72 @@ def show_product_search():
 
     return render_template("search.html")
 
-    # simple search page that has different functional layouts:
-        # search by ingredient
-        # search by brand
-        # search by product
-        # search by category
-        # search by some combination
-        # results show as list with visual composition of results by flag
-
 
 @app.route("/search", methods=["POST"])
 def process_product_search():
     """Processes search"""
 
-    user_search = request.form["user_search"]
-    session["search"] = user_search
+    if request.form["submit_btn"] == "ing_brand_search":
+        user_ingredient_search = request.form["user_ingredient_search"]
+        session["ingredient_search"] = user_ingredient_search
+        user_brand_search = request.form["user_brand_search"]
+        session["brand_search"] = user_brand_search
+        session["product_search"] = ""
+    elif request.form["submit_btn"] == "product_search":
+        user_product_search = request.form["user_product_search"]
+        session["product_search"] = user_product_search
+        session["ingredient_search"] = ""
+        session["brand_search"] = ""
 
     return redirect("/search_results")
-
 
 @app.route("/search_results")
 def show_search_results():
     """show search results"""
 
-    user_search = session["search"]
-    ingredient = Ingredient.query.filter_by(ing_name=user_search).first()
-    products = Product_Ingredient.query.filter_by(ingredient_id=ingredient.ingredient_id).all()
-    product_ids = []
-    for product in products:
-        product_ids.append(product.product_id)
-    product_results = Product.query.filter(Product.product_id.in_(product_ids))
-    # search = Product.query.filter_by(Ingredient.ing_name==user_search)
-    return render_template("search_results.html", 
-                           user_search=user_search, 
-                           product_results=product_results)
+    user_ingredient_search = session["ingredient_search"]
+    user_brand_search = session["brand_search"]
+    user_product_search = session["product_search"]
+
+    if user_ingredient_search != "":
+        ingredient = Ingredient.query.filter_by(ing_name=user_ingredient_search).first()
+        products = Product_Ingredient.query.filter_by(ingredient_id=ingredient.ingredient_id).all()
+        product_ids = []
+        for product in products:
+            product_ids.append(product.product_id)
+        ingredient_products = Product.query.filter(Product.product_id.in_(product_ids))
+    
+    if user_brand_search != "":
+        brand_products = Product.query.filter_by(brand=user_brand_search).all()
+    
+    if user_product_search != "":
+        response = Product.query.filter_by(pr_name=user_product_search).all()
+        return render_template("search_results.html", 
+                               response=response)
+
+    if user_ingredient_search != "" and user_brand_search == "":
+        response = ingredient_products
+        return render_template("search_results.html", 
+                               response=response)
+    elif user_brand_search != "" and user_ingredient_search == "":
+        response = brand_products
+        return render_template("search_results.html", 
+                               response=response)
+    elif user_brand_search != "" and user_ingredient_search != "":
+        brand_ingredient_match_products = []
+        for product in ingredient_products:
+            if product.brand == user_brand_search:
+                brand_ingredient_match_products.append(product)
+            if len(brand_ingredient_match_products) > 0:
+                response = brand_ingredient_match_products
+                return render_template("search_results.html", 
+                                       response=response)
+            else:
+                flash("It doesn't look like there are any products by that brand that include that ingredient. Try searching just by brand or ingredient.")
+                return redirect("/search")
+    else:
+        flash("It doesn't look like those were valid entries, please try again.")
+        return redirect("/search")
 
 
 @app.route("/user_flag")

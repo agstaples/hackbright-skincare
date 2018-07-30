@@ -4,13 +4,25 @@
     <h2>Search</h2>
     <form action="/search" method="POST">
         <div>
-            <label>Enter Ingredient:
-                <input type="text" name="user_search">
+            <label>Search by Ingredient and/or Brand:<br>
+                Ingredient: <input type="text" name="user_ingredient_search"><br>
+                Brand: <input type="text" name="user_brand_search">
             </label>
         </div>
-
         <div>
-            <input type="submit" value="search">
+            <input type="submit" name="submit_btn" value="ing_brand_search"><br><br>
+        </div>
+    </form>
+
+    <form action="/search" method="POST">
+        <div>
+            <label>Or Search by Product Name:<br>
+                <input type="text" name="user_product_search"><br>
+            </label>
+        </div>
+        
+        <div>
+            <input type="submit" name="submit_btn" value="product_search">
         </div>
     </form>  
 

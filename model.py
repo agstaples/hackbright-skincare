@@ -27,10 +27,10 @@ class Product(db.Model):
                            nullable=True)
 
 
-    # def __repr__(self):
-    #     """For easier id when printing"""
+    def __repr__(self):
+        """For easier id when printing"""
 
-    #     return f"<Product product_id={product_id} pr_name={pr_name} brand={brand}>"
+        return f"<Product product_id={self.product_id} pr_name={self.pr_name} brand={self.brand}>"
 
 
 class Ingredient(db.Model):
@@ -45,10 +45,10 @@ class Ingredient(db.Model):
     synonym = db.Column(db.String(200), 
                          nullable=True)
 
-    # def __repr__(self):
-    #     """For easier id when printing"""
+    def __repr__(self):
+        """For easier id when printing"""
 
-    #     return f"<Ingredient ingredient_id={ingredient_id} ing_name={pr_name}>"
+        return f"<Ingredient ingredient_id={self.ingredient_id} ing_name={self.pr_name}>"
 
 
 class Product_Ingredient(db.Model):
@@ -75,10 +75,10 @@ class Product_Ingredient(db.Model):
                                               order_by=prod_ing_id))
 
 
-    # def __repr__(self):
-    #     """For easier id when printing"""
+    def __repr__(self):
+        """For easier id when printing"""
 
-    #     return f"<Product_Ingredients prod_ing_id={prod_ing_id}>"
+        return f"<Product_Ingredients prod_ing_id={self.prod_ing_id}>"
 
 
 class User(db.Model):
@@ -93,10 +93,10 @@ class User(db.Model):
     email = db.Column(db.String(75))
     password = db.Column(db.String(100))
 
-    # def __repr__(self):
-    #     """For easier id when printing"""
+    def __repr__(self):
+        """For easier id when printing"""
 
-    #     return f"<User name={fname}>"
+        return f"<User name={self.fname}>"
 
 
 
@@ -115,10 +115,10 @@ class Flag(db.Model):
                         db.ForeignKey("users.user_id"), 
                         nullable=True)
 
-    # def __repr__(self):
-    #     """For easier id when printing"""
+    def __repr__(self):
+        """For easier id when printing"""
 
-    #     return f"<Flag name={name}>"
+        return f"<Flag name={self.name}>"
 
 
 class Ingredient_Flag(db.Model):
@@ -134,10 +134,10 @@ class Ingredient_Flag(db.Model):
     flag_id = db.Column(db.Integer, 
                         db.ForeignKey("flags.flag_id"))
 
-    # def __repr__(self):
-    #     """For easier id when printing"""
+    def __repr__(self):
+        """For easier id when printing"""
 
-    #     return f"<Ingredient Flag ingredient flag={ing_flag_id}>"
+        return f"<Ingredient Flag ingredient flag={self.ing_flag_id}>"
 
 
 class Category(db.Model):
@@ -156,10 +156,10 @@ class Category(db.Model):
     specific = db.Column(db.String(100), 
                        nullable=True)
 
-    # def __repr__(self):
-    #     """For easier id when printing"""
+    def __repr__(self):
+        """For easier id when printing"""
 
-    #     return f"<Category category={broad}/{middle}/{specific}>"
+        return f"<Category category={self.broad}/{self.middle}/{self.specific}>"
 
 
 def connect_to_db(app):

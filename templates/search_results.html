@@ -4,8 +4,8 @@
     <h2>Search Results</h2>
     <table>
     <tbody>
-        {% for product in product_results %}
-            {{ product.pr_name }}<br>
+        {% for product in response %}
+            {{ product.brand }}: {{ product.pr_name }}<br>
         {% endfor %}
     </tbody>
     </table>
