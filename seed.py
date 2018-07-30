@@ -83,28 +83,36 @@ def load_ingredients():
     prod_ing_dict = create_product_ingredient_dictionary()
     ingredient_list = []
 
-    for key, value in prod_ing_dict:
-        for item in value:
-            ingredient_list.append(item)
+    for key, value in prod_ing_dict.items():
+        for ingredient in value:
+            ingredient_list.append(ingredient)
 
-    print(ingredient_list)
+    ingredient_list = list(set(ingredient_list))
 
-    #     ingredient = Ingredient(ing_name=ing_name, 
-    #                             synonyms=synonyms)
+    for ingredient in ingredient_list:
+        
+        ingredient = Ingredient(ing_name=ingredient)
 
-    #     db.session.add(ingredient)
+        db.session.add(ingredient)
 
-    # db.session.commit()
+    db.session.commit()
 
 
 def load_product_ingredients():
     """Loads product/ingredient data"""
 
-           
-    product_ingredient = Product_Ingredient(product_id=product_id, 
-                                            ingredient_id=ingredient_id)
+    prod_ing_dict = create_product_ingredient_dictionary()
 
-    db.session.add(product_ingredient)
+    ingredients = Ingredient.query.all()
+
+    for ingredient in ingredients:
+        ingredient_name = ingredient.ing_name
+        ingredient_id = ingredient.ingredient_id
+        for key, value in prod_ing_dict.items():
+            if ingredient_name in value:
+                product_ingredient = Product_Ingredient(product_id=key, 
+                                                        ingredient_id=ingredient_id)
+                db.session.add(product_ingredient)
 
     db.session.commit()
 
@@ -166,7 +174,8 @@ if __name__ == "__main__":
     # test load of 5 products
     # load_products("test_valid_skin_urls.txt")
     # load_product_ingredients()
-    load_ingredients()
+    # load_ingredients()
+    load_product_ingredients()
 
 
 
