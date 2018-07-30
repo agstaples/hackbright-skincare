@@ -1,55 +1,110 @@
 """Seeds skincare database from csv and txt files"""
 
+from bs4 import BeautifulSoup
+import requests
+from urllib.request import Request, urlopen
 from sqlalchemy import func
 from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, Category
 from server import app
 import os
 # from sephora_scrape import scrape_relevant_product_info
 
-def load_products():
+def load_products(doc="valid_skin_urls.txt"):
     """Loads product data from Sephora scrape"""
 
-    for i in range(840):
-        f = open(f"test_text/{i+1}", "r")
-        text = f.readlines()
-        url, pr_name, cat_1, cat_2, cat_3, brand, stars, price, ing = text[0].split("|")
-        product = Product(sephora_url=url, 
-                          pr_name=pr_name, 
+    counter = 0
+
+    with open(doc) as valid_skin_urls:
+        urls = valid_skin_urls.readlines()
+        for url in urls:
+            counter += 1
+            url = str(url.rstrip())
+            # providing headers for client, otherwise request fails
+            header = {"User-Agent":"Firefox"}
+            request = Request(url, headers=header)
+            page = urlopen(request)
+            soup = BeautifulSoup(page, "html.parser")
+            name = soup.find(attrs={"class": "css-1g2jq23"}).string
+            if name:
+                brand = soup.find(attrs={"class": "css-cjz2sh"}).string
+                # getting star rating as percentage
+                stars_object = soup.find(attrs={"class": "css-dtomnp"})
+                stars = str(stars_object["style"].strip("%").split(":")[-1])
+                # getting price from sephora page
+                price_string = soup.find(attrs={"class": "css-18suhml"}).string
+                if price_string == None:
+                    price = str(0)
+                else:
+                    price = str(price_string.strip("$"))
+                product_box = soup.find_all(attrs={'class': 'css-1juot2r'})
+                ingredients_all = product_box[-1].text
+                ingredients_list = ingredients_all.split("\n")
+                if len(ingredients_list[-1]) < 1:
+                    ingredients = ingredients_list[-2].rstrip(".")
+                else:
+                    ingredients = ingredients_list[-1].rstrip(".")
+                product = Product(sephora_url=url, 
+                          pr_name=name, 
                           brand=brand, 
                           stars=float(stars), 
-                          price=float(price))
-
-        db.session.add(product)
-
+                          price=float(price),
+                          ingredients=ingredients)
+                db.session.add(product)
+                print(counter)
+                print(url)
+            else:
+                print("uh oh")
+                print(url)
+                return
+    print("Success!")
     db.session.commit()
 
 
-def load_ingredients(doc):
+def create_product_ingredient_dictionary():
+    """created dictionary or product ingredients to populate ingredient and product_ingredient tables"""
+
+    prod_ing_dict = {}
+
+    ingredients = Product.query.all()
+    for ingredient in ingredients:
+        product_id = ingredient.product_id
+        prod_ing_dict[product_id] = []
+        ingredients_all = ingredient.ingredients.split(",")
+        for ingredient_single in ingredients_all:
+            ingredient_single = ingredient_single.strip(" ").rstrip(".\n").rstrip(".\r")
+            prod_ing_dict[product_id].append(ingredient_single)
+
+    return prod_ing_dict
+
+
+def load_ingredients():
     """Loads ingredient data"""
 
-    for i, row in enumerate(open(doc)):
-        row = row.rstrip()
-        ing_name, synonyms = row.split("|")
+    prod_ing_dict = create_product_ingredient_dictionary()
+    ingredient_list = []
 
-        ingredient = Ingredient(ing_name=ing_name, 
-                                synonyms=synonyms)
+    for key, value in prod_ing_dict:
+        for item in value:
+            ingredient_list.append(item)
 
-        db.session.add(ingredient)
+    print(ingredient_list)
 
-    db.session.commit()
+    #     ingredient = Ingredient(ing_name=ing_name, 
+    #                             synonyms=synonyms)
+
+    #     db.session.add(ingredient)
+
+    # db.session.commit()
 
 
-def load_product_ingredients(doc):
+def load_product_ingredients():
     """Loads product/ingredient data"""
 
-    for i, row in enumerate(open(doc)):
-        row = row.rstrip()
-        product_id, ingredient_id = row.split("|")
+           
+    product_ingredient = Product_Ingredient(product_id=product_id, 
+                                            ingredient_id=ingredient_id)
 
-        product_ingredient = Product_Ingredient(product_id=product_id, 
-                                                ingredient_id=ingredient_id)
-
-        db.session.add(product_ingredient)
+    db.session.add(product_ingredient)
 
     db.session.commit()
 
@@ -108,7 +163,10 @@ if __name__ == "__main__":
     db.create_all()
 
 
-    load_products()
+    # test load of 5 products
+    # load_products("test_valid_skin_urls.txt")
+    # load_product_ingredients()
+    load_ingredients()
 
 
 

@@ -7,7 +7,6 @@ db = SQLAlchemy()
 
 
 # table definitions:
-
 class Product(db.Model):
     """Sephora product info and ingredients list"""
 
@@ -24,12 +23,14 @@ class Product(db.Model):
                       nullable=True)
     price = db.Column(db.Integer, 
                       nullable=True)
+    ingredients = db.Column(db.String(500000),
+                           nullable=True)
 
 
-    def __repr__(self):
-        """For easier id when printing"""
+    # def __repr__(self):
+    #     """For easier id when printing"""
 
-        return f"<Product product_id={product_id} pr_name={pr_name} brand={brand}>"
+    #     return f"<Product product_id={product_id} pr_name={pr_name} brand={brand}>"
 
 
 class Ingredient(db.Model):
