@@ -157,13 +157,13 @@ def show_search_results():
         for product in ingredient_products:
             if product.brand == user_brand_search:
                 brand_ingredient_match_products.append(product)
-            if len(brand_ingredient_match_products) > 0:
-                response = brand_ingredient_match_products
-                return render_template("search_results.html", 
+        if len(brand_ingredient_match_products) > 0:
+            response = brand_ingredient_match_products
+            return render_template("search_results.html", 
                                        response=response)
-            else:
-                flash("It doesn't look like there are any products by that brand that include that ingredient. Try searching just by brand or ingredient.")
-                return redirect("/search")
+        else:
+            flash("It doesn't look like there are any products by that brand that include that ingredient. Try searching just by brand or ingredient.")
+            return redirect("/search")
     else:
         flash("It doesn't look like those were valid entries, please try again.")
         return redirect("/search")
