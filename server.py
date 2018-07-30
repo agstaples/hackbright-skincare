@@ -98,6 +98,8 @@ def logout():
 def show_product_search():
     """shows main search page"""
 
+    return render_template("search.html")
+
     # simple search page that has different functional layouts:
         # search by ingredient
         # search by brand
@@ -111,7 +113,12 @@ def show_product_search():
 def process_product_search():
     """Processes search"""
 
-    # executes user's search
+    user_search = request.form["user_search"]
+    # returns list of product objects:
+    search = db.session.query(Product).filter(Ingredient.ing_name=="PPG-20 Methyl Glucose Ether").all()
+    # print(search[0].pr_name)
+
+
 
 
 @app.route("/user_flag")

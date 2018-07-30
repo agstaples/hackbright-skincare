@@ -50,13 +50,10 @@ def load_products(doc="valid_skin_urls.txt"):
                           price=float(price),
                           ingredients=ingredients)
                 db.session.add(product)
-                print(counter)
-                print(url)
             else:
                 print("uh oh")
                 print(url)
                 return
-    print("Success!")
     db.session.commit()
 
 
@@ -171,11 +168,14 @@ if __name__ == "__main__":
     db.create_all()
 
 
-    # test load of 5 products
     # load_products("test_valid_skin_urls.txt")
-    # load_product_ingredients()
     # load_ingredients()
-    load_product_ingredients()
+    # load_product_ingredients()
+
+    search = db.session.query(Product).filter(Ingredient.ing_name=="PPG-20 Methyl Glucose Ether").all()
+    print(search[0].pr_name)
+
+
 
 
 

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <h2>Search</h2>
+    <form action="/search" method="POST">
+        <div>
+            <label>Enter Ingredient:
+                <input type="text" name="user_search">
+            </label>
+        </div>
+
+        <div>
+            <input type="submit" value="search">
+        </div>
+    </form>  
+
+{% endblock %}

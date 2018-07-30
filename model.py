@@ -66,6 +66,15 @@ class Product_Ingredient(db.Model):
                               db.ForeignKey("ingredients.ingredient_id"), 
                               nullable=True)
 
+    ingredient = db.relationship("Ingredient",
+                           backref=db.backref("product_ingredients",
+                                              order_by=prod_ing_id))
+
+    product = db.relationship("Product",
+                           backref=db.backref("product_ingredients",
+                                              order_by=prod_ing_id))
+
+
     def __repr__(self):
         """For easier id when printing"""
 
