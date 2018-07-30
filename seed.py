@@ -172,8 +172,6 @@ if __name__ == "__main__":
     # load_ingredients()
     # load_product_ingredients()
 
-    search = db.session.query(Product).filter(Ingredient.ing_name=="PPG-20 Methyl Glucose Ether").all()
-    print(search[0].pr_name)
 
 
 

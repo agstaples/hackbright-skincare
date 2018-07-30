@@ -2,7 +2,7 @@
 
 from jinja2 import StrictUndefined
 
-from flask import Flask, render_template, request, flash, redirect, session
+from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, Category
@@ -114,11 +114,21 @@ def process_product_search():
     """Processes search"""
 
     user_search = request.form["user_search"]
-    # returns list of product objects:
+    session["search"] = user_search
+
+    return redirect("/search_results")
+
+
+@app.route("/search_results")
+def show_search_results():
+    """show search results"""
+
+    user_search = session["search"]
     search = db.session.query(Product).filter(Ingredient.ing_name=="PPG-20 Methyl Glucose Ether").all()
-    # print(search[0].pr_name)
+    print(search[0].pr_name)
 
-
+    return render_template("search_results.html", 
+                           search=search)
 
 
 @app.route("/user_flag")
