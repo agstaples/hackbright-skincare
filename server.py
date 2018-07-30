@@ -124,11 +124,16 @@ def show_search_results():
     """show search results"""
 
     user_search = session["search"]
-    search = db.session.query(Product).filter(Ingredient.ing_name=="PPG-20 Methyl Glucose Ether").all()
-    print(search[0].pr_name)
-
+    ingredient = Ingredient.query.filter_by(ing_name=user_search).first()
+    products = Product_Ingredient.query.filter_by(ingredient_id=ingredient.ingredient_id).all()
+    product_ids = []
+    for product in products:
+        product_ids.append(product.product_id)
+    product_results = Product.query.filter(Product.product_id.in_(product_ids))
+    # search = Product.query.filter_by(Ingredient.ing_name==user_search)
     return render_template("search_results.html", 
-                           search=search)
+                           user_search=user_search, 
+                           product_results=product_results)
 
 
 @app.route("/user_flag")

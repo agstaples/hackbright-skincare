@@ -3,15 +3,9 @@
 
     <h2>Search Results</h2>
     <table>
-    <thead>
-         <tr>Search Results</tr>
-    </thead>
     <tbody>
-        {% for product in search %}
-            <tr>{{ product.pr_name }}</tr><br>
-        {% endfor %}
-        {% for product in search %}
-            <tr>{{ product.ingredients }}</tr><br>
+        {% for product in product_results %}
+            {{ product.pr_name }}<br>
         {% endfor %}
     </tbody>
     </table>
