@@ -116,14 +116,14 @@ def process_product_search():
     # if doing brand/ingredient search: set product_search to empty
     if request.form["submit_btn"] == "ing_brand_search":
         user_ingredient_search = request.form["user_ingredient_search"]
-        session["ingredient_search"] = user_ingredient_search
+        session["ingredient_search"] = user_ingredient_search.lower()
         user_brand_search = request.form["user_brand_search"]
-        session["brand_search"] = user_brand_search
+        session["brand_search"] = user_brand_search.lower()
         session["product_search"] = ""
     # if doing product search: set ingredient_search and brand_search to empty
     elif request.form["submit_btn"] == "product_search":
         user_product_search = request.form["user_product_search"]
-        session["product_search"] = user_product_search
+        session["product_search"] = user_product_search.lower()
         session["ingredient_search"] = ""
         session["brand_search"] = ""
 
@@ -139,7 +139,7 @@ def show_search_results():
 
     # getting relevant product information from ingredient name
     if user_ingredient_search != "":
-        ingredient = Ingredient.query.filter_by(ing_name=user_ingredient_search).first()
+        ingredient = Ingredient.query.filter_by(ing_name_lower=user_ingredient_search).first()
         products = Product_Ingredient.query.filter_by(ingredient_id=ingredient.ingredient_id).all()
         product_ids = []
         for product in products:
@@ -148,11 +148,11 @@ def show_search_results():
     
     # getting relevant product information from brand name
     if user_brand_search != "":
-        brand_products = Product.query.filter_by(brand=user_brand_search).all()
+        brand_products = Product.query.filter_by(brand_lower=user_brand_search).all()
     
     # getting relevant product information from product name
     if user_product_search != "":
-        response = Product.query.filter_by(pr_name=user_product_search).all()
+        response = Product.query.filter_by(pr_name_lower=user_product_search).all()
         return render_template("search_results.html", 
                                response=response)
 

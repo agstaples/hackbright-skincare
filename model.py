@@ -16,7 +16,10 @@ class Product(db.Model):
                            autoincrement=True, 
                            primary_key=True)
     pr_name = db.Column(db.String(1000))
+    pr_name_lower = db.Column(db.String(1000))
     brand = db.Column(db.String(1000), 
+                         nullable=True)
+    brand_lower = db.Column(db.String(1000), 
                          nullable=True)
     sephora_url = db.Column(db.String(1000))
     stars = db.Column(db.Integer, 
@@ -42,13 +45,16 @@ class Ingredient(db.Model):
                            autoincrement=True, 
                            primary_key=True)
     ing_name = db.Column(db.String(75))
+    ing_name_lower = db.Column(db.String(75))
     synonym = db.Column(db.String(200), 
+                         nullable=True)
+    synonym_lower = db.Column(db.String(200), 
                          nullable=True)
 
     def __repr__(self):
         """For easier id when printing"""
 
-        return f"<Ingredient ingredient_id={self.ingredient_id} ing_name={self.pr_name}>"
+        return f"<Ingredient ingredient_id={self.ingredient_id} ing_name={self.ing_name}>"
 
 
 class Product_Ingredient(db.Model):
@@ -66,6 +72,7 @@ class Product_Ingredient(db.Model):
                               db.ForeignKey("ingredients.ingredient_id"), 
                               nullable=True)
 
+    
     ingredient = db.relationship("Ingredient",
                            backref=db.backref("product_ingredients",
                                               order_by=prod_ing_id))
@@ -110,7 +117,6 @@ class Flag(db.Model):
                            primary_key=True)
     name = db.Column(db.String(150))
     description = db.Column(db.String(400))
-    citation = db.Column(db.String(400))
     user_id = db.Column(db.Integer, 
                         db.ForeignKey("users.user_id"), 
                         nullable=True)

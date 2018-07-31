@@ -9,7 +9,7 @@ from server import app
 import os
 # from sephora_scrape import scrape_relevant_product_info
 
-def load_products(doc="valid_skin_urls.txt"):
+def load_products(doc="seed_data/valid_skin_urls.txt"):
     """Loads product data from Sephora scrape"""
 
     counter = 0
@@ -51,7 +51,9 @@ def load_products(doc="valid_skin_urls.txt"):
                 # creating product instance
                 product = Product(sephora_url=url, 
                           pr_name=name, 
+                          pr_name_lower=name.lower(), 
                           brand=brand, 
+                          brand_lower=brand.lower(),
                           stars=float(stars), 
                           price=float(price),
                           ingredients=ingredients)
@@ -79,7 +81,7 @@ def create_product_ingredient_dictionary():
         for ingredient_single in ingredients_all:
             # cleaning up individual ingredientt and adding as values to dictionary
             ingredient_single = ingredient_single.strip(" ").rstrip(".\n").rstrip(".\r")
-            prod_ing_dict[product_id].append(ingredient_single)
+            prod_ing_dict[product_id].append(ingredient_single.lower())
 
     return prod_ing_dict
 
@@ -99,7 +101,8 @@ def load_ingredients():
 
     for ingredient in ingredient_list:
         # creating ingredient instance
-        ingredient = Ingredient(ing_name=ingredient)
+        ingredient = Ingredient(ing_name=ingredient, 
+                                ing_name_lower=ingredient.lower())
 
         db.session.add(ingredient)
 
@@ -128,21 +131,21 @@ def load_product_ingredients():
     db.session.commit()
 
 
-# def load_flags(doc):
-#     """Loads flag data"""
+def load_flags(doc="seed_data/flags.txt"):
+    """Loads flag data"""
 
-#     for i, row in enumerate(open(doc)):
-#         row = row.rstrip()
-#         name, description, citation, user_id = row.split("|")
+    for i, row in enumerate(open(doc)):
+        row = row.rstrip()
+        name, description, citation, user_id = row.split("|")
 
-#         flag = Flag(name=name, 
-#                     description=description, 
-#                     citation=citation, 
-#                     user_id=user_id)
+        flag = Flag(name=name, 
+                    description=description, 
+                    citation=citation, 
+                    user_id=user_id)
 
-#         db.session.add(flag)
+        db.session.add(flag)
 
-#     db.session.commit()
+    db.session.commit()
 
 
 # def load_ingredient_flags(doc):
@@ -182,9 +185,10 @@ if __name__ == "__main__":
     db.create_all()
 
 
-    # load_products("test_valid_skin_urls.txt")
-    # load_ingredients()
-    # load_product_ingredients()
+    load_products("test_seed_data/test_valid_skin_urls.txt")
+    load_ingredients()
+    load_product_ingredients()
+    load_flags("test_seed_data/test_flags.txt")
 
 
 
