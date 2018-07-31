@@ -7,7 +7,6 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, Category
 
-from werkzeug.exceptions import BadRequestKeyError
 
 app = Flask(__name__)
 
@@ -41,14 +40,17 @@ def process_registration():
     email = request.form["email"]
     password = request.form["password"]
 
+    # checking if user already exists in database
     if User.query.filter_by(email=email).first():
         flash("That email address already exists in our files, please login.")
         return redirect("/login")
+    # creating new user
     else:
         user = User(fname=fname, 
                     email=email, 
                     password=password)
 
+    # commiting new user to database
     db.session.add(user)
     db.session.commit()
 
@@ -70,16 +72,19 @@ def process_login():
     email = request.form["email"]
     password = request.form["password"]
 
+    # checking if user already exists in database
     user = User.query.filter_by(email=email).first()
 
     if not user:
         flash("That email address does not exist in our files, please try again or click Register for new users.")
         return redirect("/")
 
+    # checking if password valid
     if user.password != password:
         flash(f"Welcome back {user.fname}! Please try your password again, that wasn't quite right.")
         return redirect("/login")
 
+    # adding user to session
     session["user_id"] = user.user_id
 
     flash("You're logged in. Let's get searching.")
@@ -90,6 +95,7 @@ def process_login():
 def logout():
     """Logs out user"""
 
+    # deleting user from session when they log out
     del session["user_id"]
     flash("You're logged out. Bye for now.")
     return redirect("/")
@@ -106,12 +112,15 @@ def show_product_search():
 def process_product_search():
     """Processes search"""
 
+    # getting search terms from form
+    # if doing brand/ingredient search: set product_search to empty
     if request.form["submit_btn"] == "ing_brand_search":
         user_ingredient_search = request.form["user_ingredient_search"]
         session["ingredient_search"] = user_ingredient_search
         user_brand_search = request.form["user_brand_search"]
         session["brand_search"] = user_brand_search
         session["product_search"] = ""
+    # if doing product search: set ingredient_search and brand_search to empty
     elif request.form["submit_btn"] == "product_search":
         user_product_search = request.form["user_product_search"]
         session["product_search"] = user_product_search
@@ -128,6 +137,7 @@ def show_search_results():
     user_brand_search = session["brand_search"]
     user_product_search = session["product_search"]
 
+    # getting relevant product information from ingredient name
     if user_ingredient_search != "":
         ingredient = Ingredient.query.filter_by(ing_name=user_ingredient_search).first()
         products = Product_Ingredient.query.filter_by(ingredient_id=ingredient.ingredient_id).all()
@@ -136,22 +146,27 @@ def show_search_results():
             product_ids.append(product.product_id)
         ingredient_products = Product.query.filter(Product.product_id.in_(product_ids))
     
+    # getting relevant product information from brand name
     if user_brand_search != "":
         brand_products = Product.query.filter_by(brand=user_brand_search).all()
     
+    # getting relevant product information from product name
     if user_product_search != "":
         response = Product.query.filter_by(pr_name=user_product_search).all()
         return render_template("search_results.html", 
                                response=response)
 
+    # executing search for ingredient and no brand
     if user_ingredient_search != "" and user_brand_search == "":
         response = ingredient_products
         return render_template("search_results.html", 
                                response=response)
+    # executing search for brand and no ingredient
     elif user_brand_search != "" and user_ingredient_search == "":
         response = brand_products
         return render_template("search_results.html", 
                                response=response)
+    # executing search for ingredient and brand
     elif user_brand_search != "" and user_ingredient_search != "":
         brand_ingredient_match_products = []
         for product in ingredient_products:
