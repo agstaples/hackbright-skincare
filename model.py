@@ -30,30 +30,21 @@ class Product(db.Model):
                                  nullable=True)
 
     prod_ingredients = db.relationship("Ingredient",
-                                  secondary="join(Product_Ingredient, Ingredient, Product_Ingredient.ingredient_id == Ingredient.ingredient_id)", 
-                                  primaryjoin="and_(Product.product_id == Product_Ingredient.product_id)", 
-                                  secondaryjoin="Ingredient.ingredient_id == Product_Ingredient.ingredient_id", 
-                                  backref=db.backref("products",
+                                       secondary="join(Product_Ingredient, Ingredient, Product_Ingredient.ingredient_id == Ingredient.ingredient_id)", 
+                                       primaryjoin="and_(Product.product_id == Product_Ingredient.product_id)", 
+                                       secondaryjoin="Ingredient.ingredient_id == Product_Ingredient.ingredient_id", 
+                                       backref=db.backref("products",
                                                      order_by=product_id))
 
-    
-    def get_ingredients_by_product(self):
-        """returns ingredient associated with product"""
-
-    def get_flags_by_product(self):
+    def get_flags(self):
         """returns flags associated with product"""
 
-        # response_flags = []
-        # for ingredient in self.ingredients:
-        #     return ingredient.flags
-        #     # you need to set up flag to ingredient table relationships,
-        #     # then you can finish this code here, that will be used on 
-        #     # line 153 of server.py
-        
-        # return response_products
-
-    def get_categories_by_product(self):
-        """returns categories associated with product"""
+        response_flags = []
+        for ingredient in self.prod_ingredients:
+            for flag in ingredient.ing_flags:
+                response_flags.append(flag)
+        response_flags = list(set(response_flags))
+        return response_flags
 
     def __repr__(self):
         """For easier id when printing"""
@@ -90,22 +81,6 @@ class Ingredient(db.Model):
                                   backref=db.backref("ingredients",
                                                      order_by=ingredient_id))
 
-
-    def get_products_by_ingredient(self):
-        """returns products associated with ingredient"""
-
-        response_products = []
-        for product_ingredient in self.products:
-            response_products.append(product_ingredient.products)
-        
-        return response_products
-
-    def get_flags_by_ingredient(self):
-        """returns flags associated with ingredient"""
-
-    def get_categories_by_ingredient(self):
-        """returns categories associated with ingredient"""
-
     def __repr__(self):
         """For easier id when printing"""
 
@@ -127,7 +102,6 @@ class Product_Ingredient(db.Model):
                               db.ForeignKey("ingredients.ingredient_id"), 
                               nullable=True)
 
-
     def __repr__(self):
         """For easier id when printing"""
 
@@ -145,9 +119,6 @@ class User(db.Model):
     fname = db.Column(db.String(100))
     email = db.Column(db.String(75))
     password = db.Column(db.String(100))
-
-    def get_flags_by_user(self):
-      """returns flags associated with user. all global flags and any custom user flags"""
 
     def __repr__(self):
         """For easier id when printing"""
@@ -179,20 +150,10 @@ class Flag(db.Model):
                                   backref=db.backref("flags",
                                                      order_by=flag_id))
 
-
-    def get_products_by_flag(self):
-        """returns products associated with flag"""
-
-    def get_ingredients_by_flag(self):
-        """returns ingredients associated with flag"""
-
-    def get_categories_by_flag(self):
-        """returns categories associated with flag"""
-
     def __repr__(self):
         """For easier id when printing"""
 
-        return f"<Flag name={self.name}>"
+        return f"<Flag flag_id={self.flag_id} name={self.name}>"
 
 
 class Ingredient_Flag(db.Model):
@@ -230,15 +191,6 @@ class Category(db.Model):
                        nullable=True)
     specific = db.Column(db.String(100), 
                        nullable=True)
-
-    def get_products_by_category(self):
-        """returns products associated with category"""
-
-    def get_ingredients_by_category(self):
-        """returns ingredients associated with category"""
-
-    def get_flags_by_category(self):
-        """returns flags associated with category"""
 
     def __repr__(self):
         """For easier id when printing"""

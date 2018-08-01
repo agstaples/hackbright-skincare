@@ -140,7 +140,7 @@ def show_search_results():
     # getting relevant product information from ingredient name
     if user_ingredient_search != "":
         ingredient = Ingredient.query.filter_by(ing_name_lower=user_ingredient_search).first()
-        ingredient_products = ingredient.get_products_by_ingredient()
+        ingredient_products = ingredient.ing_products
 
     # getting relevant product information from brand name
     if user_brand_search != "":

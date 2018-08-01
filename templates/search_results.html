@@ -5,7 +5,10 @@
     <table>
     <tbody>
         {% for product in response %}
-<!--             youre going to need to rewrite this for list of product, flag tuples -->
+            <br>{{ product.brand }}: {{ product.pr_name }}<br>
+            {% for flag in product.get_flags() %} 
+                ~~~~ {{ flag.name }}<br>
+            {% endfor %}
         {% endfor %}
     </tbody>
     </table>
