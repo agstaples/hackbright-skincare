@@ -21,6 +21,7 @@ def load_products(doc="seed_data/valid_skin_urls.txt"):
             counter += 1
             url = str(url.rstrip())
             # providing headers for client, otherwise request fails
+            print(url)
             header = {"User-Agent":"Firefox"}
             request = Request(url, headers=header)
             page = urlopen(request)
@@ -56,7 +57,7 @@ def load_products(doc="seed_data/valid_skin_urls.txt"):
                           brand_lower=brand.lower(),
                           stars=float(stars), 
                           price=float(price),
-                          ingredients=ingredients)
+                          ingredients_list=ingredients)
                 db.session.add(product)
             else:
                 print("***ERROR***")
@@ -66,7 +67,7 @@ def load_products(doc="seed_data/valid_skin_urls.txt"):
 
 
 def create_product_ingredient_dictionary():
-    """created dictionary or product ingredients to populate ingredient and product_ingredient tables"""
+    """creates dictionary of product ingredients to populate ingredient and product_ingredient tables"""
 
     prod_ing_dict = {}
 
@@ -77,7 +78,7 @@ def create_product_ingredient_dictionary():
         # adding product_id keys to dictionary
         prod_ing_dict[product_id] = []
         # getting list of ingredients for each product
-        ingredients_all = product.ingredients.split(",")
+        ingredients_all = product.ingredients_list.split(",")
         for ingredient_single in ingredients_all:
             # cleaning up individual ingredientt and adding as values to dictionary
             ingredient_single = ingredient_single.strip(" ").rstrip(".\n").rstrip(".\r")
@@ -134,33 +135,58 @@ def load_product_ingredients():
 def load_flags(doc="seed_data/flags.txt"):
     """Loads flag data"""
 
-    for i, row in enumerate(open(doc)):
-        row = row.rstrip()
-        name, description, citation, user_id = row.split("|")
-
-        flag = Flag(name=name, 
-                    description=description, 
-                    citation=citation, 
-                    user_id=user_id)
-
-        db.session.add(flag)
+    with open(doc) as flags_doc:
+        flags = flags_doc.readlines()
+        for flag in flags:
+            name, description, ingredients = flag.split("|")
+            flag = Flag(name=name, 
+                        description=description,
+                        ingredients_list=ingredients)
+            db.session.add(flag)
 
     db.session.commit()
 
 
-# def load_ingredient_flags(doc):
-#     """Loads ingredient/flag data"""
+def create_flag_ingredient_dictionary():
+    """creates dictionary of flag ingredients to populate flag_ingredient table"""
 
-#     for i, row in enumerate(open(doc)):
-#         row = row.rstrip()
-#         ingredient_id, flag_id = row.split("|")
+    fl_ing_dict = {}
 
-#         ingredient_flag = Ingredient_Flag(ingredient_id=ingredient_id, 
-#                                           flag_id=flag_id)
+    flags = Flag.query.all()
+    for flag in flags:
+        flag_id = flag.flag_id
+        # adding flag_id keys to dictionary
+        fl_ing_dict[flag_id] = []
+        # getting list of ingredients for each flag
+        ingredients_all = flag.ingredients_list.split(",")
+        for ingredient_single in ingredients_all:
+            # cleaning up individual ingredientt and adding as values to dictionary
+            ingredient_single = ingredient_single.strip(" ").rstrip(".\n").rstrip(".\r")
+            fl_ing_dict[flag_id].append(ingredient_single.lower())
 
-#         db.session.add(ingredient_flag)
+    return fl_ing_dict
 
-#     db.session.commit()
+
+def load_ingredient_flags():
+    """Loads ingredient/flag data"""
+
+    fl_ing_dict = create_flag_ingredient_dictionary()
+
+    # getting full list of unique ingredients
+    ingredients = Ingredient.query.all()
+
+    for ingredient in ingredients:
+        ingredient_name = ingredient.ing_name
+        ingredient_id = ingredient.ingredient_id
+        # matching ingredient to product_id
+        for key, value in fl_ing_dict.items():
+            if ingredient_name in value:
+                # creating product/ingredient instance
+                ingredient_flag = Ingredient_Flag(flag_id=key, 
+                                                  ingredient_id=ingredient_id)
+                db.session.add(ingredient_flag)
+
+    db.session.commit()
 
 
 # def load_categories(doc):
@@ -189,6 +215,7 @@ if __name__ == "__main__":
     load_ingredients()
     load_product_ingredients()
     load_flags("test_seed_data/test_flags.txt")
+    load_ingredient_flags()
 
 
 

@@ -140,19 +140,17 @@ def show_search_results():
     # getting relevant product information from ingredient name
     if user_ingredient_search != "":
         ingredient = Ingredient.query.filter_by(ing_name_lower=user_ingredient_search).first()
-        products = Product_Ingredient.query.filter_by(ingredient_id=ingredient.ingredient_id).all()
-        product_ids = []
-        for product in products:
-            product_ids.append(product.product_id)
-        ingredient_products = Product.query.filter(Product.product_id.in_(product_ids))
-    
+        ingredient_products = ingredient.get_products_by_ingredient()
+
     # getting relevant product information from brand name
     if user_brand_search != "":
         brand_products = Product.query.filter_by(brand_lower=user_brand_search).all()
     
     # getting relevant product information from product name
     if user_product_search != "":
-        response = Product.query.filter_by(pr_name_lower=user_product_search).all()
+        product = Product.query.filter_by(pr_name_lower=user_product_search).first()
+        response = []
+        response.append(product, product.get_flags_by_product())
         return render_template("search_results.html", 
                                response=response)
 
@@ -186,7 +184,7 @@ def show_search_results():
 
 @app.route("/user_flag")
 def show_custom_flag_form():
-    """Shows for for user to create custom flag"""
+    """Shows form for user to create custom flag"""
 
     # shows user form for creating custom flags
 
