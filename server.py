@@ -8,6 +8,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, Category
 
 
+# from forms import Registration_Form, Login_Form, User_Flag_Form, Search_Form
+
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
@@ -150,7 +152,7 @@ def show_search_results():
     if user_product_search != "":
         product = Product.query.filter_by(pr_name_lower=user_product_search).first()
         response = []
-        response.append(product, product.get_flags_by_product())
+        response.append(product)
         return render_template("search_results.html", 
                                response=response)
 
