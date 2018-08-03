@@ -26,6 +26,12 @@ class Product(db.Model):
                       nullable=True)
     price = db.Column(db.Integer, 
                       nullable=True)
+    category_1 = db.Column(db.String(150), 
+                           nullable=True)
+    category_2 = db.Column(db.String(150), 
+                           nullable=True)
+    category_3 = db.Column(db.String(150), 
+                           nullable=True)
     ingredients_list = db.Column(db.String(500000),
                                  nullable=True)
 

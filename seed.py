@@ -41,6 +41,11 @@ def load_products(doc="seed_data/valid_skin_urls.txt"):
                     price = str(0)
                 else:
                     price = str(price_string.strip("$"))
+                # getting category information
+                category_1_2 = soup.find_all(attrs={"class": "css-u2mtre"})
+                category_1 = category_1_2[0].string
+                category_2 = category_1_2[1].string
+                category_3 = soup.find(attrs={"class": "css-j60h5s"}).string
                 # product box contains all product information inculding ingredients
                 product_box = soup.find_all(attrs={'class': 'css-1juot2r'})
                 ingredients_all = product_box[-1].text
@@ -57,6 +62,9 @@ def load_products(doc="seed_data/valid_skin_urls.txt"):
                           brand_lower=brand.lower(),
                           stars=float(stars), 
                           price=float(price),
+                          category_1=category_1, 
+                          category_2=category_2, 
+                          category_3=category_3, 
                           ingredients_list=ingredients)
                 db.session.add(product)
             else:
@@ -189,21 +197,21 @@ def load_ingredient_flags():
     db.session.commit()
 
 
-# def load_categories(doc):
-#     """Loads product category data"""
+def load_categories(doc):
+    """Loads product category data"""
 
-#     for i, row in enumerate(open(doc)):
-#         row = row.rstrip()
-#         product_id, broad, middle, specific = row.split("|")
+    for i, row in enumerate(open(doc)):
+        row = row.rstrip()
+        product_id, broad, middle, specific = row.split("|")
 
-#         category = Category(product_id=product_id, 
-#                             broad=broad, 
-#                             middle=middle, 
-#                             specific=specific)
+        category = Category(product_id=product_id, 
+                            broad=broad, 
+                            middle=middle, 
+                            specific=specific)
 
-#         db.session.add(category)
+        db.session.add(category)
 
-#     db.session.commit()
+    db.session.commit()
 
 
 if __name__ == "__main__":
