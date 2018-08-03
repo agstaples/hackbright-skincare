@@ -7,6 +7,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, Category
 
+from search import search_by_product, search_by_ingredient, search_by_brand, search_by_ingredient_and_brand
+
 
 # from forms import Registration_Form, Login_Form, User_Flag_Form, Search_Form
 
@@ -135,54 +137,34 @@ def process_product_search():
 def show_search_results():
     """show search results"""
 
-    user_ingredient_search = session["ingredient_search"]
-    user_brand_search = session["brand_search"]
-    user_product_search = session["product_search"]
-
-    # getting relevant product information from ingredient name
-    if user_ingredient_search != "":
-        ingredient = Ingredient.query.filter_by(ing_name_lower=user_ingredient_search).first()
-        ingredient_products = ingredient.ing_products
-
-    # getting relevant product information from brand name
-    if user_brand_search != "":
-        brand_products = Product.query.filter_by(brand_lower=user_brand_search).all()
-    
     # getting relevant product information from product name
-    if user_product_search != "":
-        product = Product.query.filter_by(pr_name_lower=user_product_search).first()
-        response = []
-        response.append(product)
-        return render_template("search_results.html", 
-                               response=response)
+    if session["product_search"] != "":
+        user_product_search = session["product_search"]
+        response = search_by_product(user_product_search)
 
-    # executing search for ingredient and no brand
-    if user_ingredient_search != "" and user_brand_search == "":
-        response = ingredient_products
+    # getting relevant product information from ingredient and no brand
+    elif session["ingredient_search"] != "" and session["brand_search"] == "":
+        user_ingredient_search = session["ingredient_search"]
+        response = search_by_ingredient(user_ingredient_search)
+
+    # getting relevant product information from brand and no ingredient
+    elif session["brand_search"] != "" and session["ingredient_search"] == "":
+        user_brand_search = session["brand_search"]
+        response = search_by_brand(user_brand_search)
+
+    # getting relevant product information from ingredient and brand
+    elif session["brand_search"] != "" and session["ingredient_search"] != "":
+        user_ingredient_search = session["ingredient_search"]
+        user_brand_search = session["brand_search"]
+        response = search_by_ingredient_and_brand(user_ingredient_search, user_brand_search)
+
+    # flash error or render search results based on search results
+    if response:
         return render_template("search_results.html", 
-                               response=response)
-    # executing search for brand and no ingredient
-    elif user_brand_search != "" and user_ingredient_search == "":
-        response = brand_products
-        return render_template("search_results.html", 
-                               response=response)
-    # executing search for ingredient and brand
-    elif user_brand_search != "" and user_ingredient_search != "":
-        brand_ingredient_match_products = []
-        for product in ingredient_products:
-            if product.brand == user_brand_search:
-                brand_ingredient_match_products.append(product)
-        if len(brand_ingredient_match_products) > 0:
-            response = brand_ingredient_match_products
-            return render_template("search_results.html", 
-                                       response=response)
-        else:
-            flash("It doesn't look like there are any products by that brand that include that ingredient. Try searching just by brand or ingredient.")
-            return redirect("/search")
+                           response=response)
     else:
-        flash("It doesn't look like those were valid entries, please try again.")
+        flash("It doesn't look like that was a valid search. Please try again.")
         return redirect("/search")
-
 
 @app.route("/user_flag")
 def show_custom_flag_form():
