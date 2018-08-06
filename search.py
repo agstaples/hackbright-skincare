@@ -1,7 +1,7 @@
 # search functions
 from fuzzywuzzy import process, fuzz
 
-from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, Category
+from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag
 
 
 

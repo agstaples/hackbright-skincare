@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
+
     <h2>Search</h2>
     <form action="/search" method="POST">
         <div>
@@ -10,7 +11,7 @@
             </label>
         </div>
         <div>
-            <input type="submit" name="submit_btn" value="ing_brand_search"><br><br>
+            <button id="brand_ing_submit_btn" class="submit_btn">Ingredient and/or Brand Search</button><br><br>
         </div>
     </form>
 
@@ -22,8 +23,10 @@
         </div>
         
         <div>
-            <input type="submit" name="submit_btn" value="product_search">
+            <button id="pr_submit_btn" class="submit_btn">Product Search</button><br><br>
         </div>
     </form>  
+
+    <div id="search_results_table">***Display Search Results***</div>
 
 {% endblock %}

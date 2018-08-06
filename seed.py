@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import requests
 from urllib.request import Request, urlopen
 from sqlalchemy import func
-from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, Category
+from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag
 from server import app
 import os
 # from sephora_scrape import scrape_relevant_product_info
@@ -28,49 +28,52 @@ def load_products(doc="seed_data/valid_skin_urls.txt"):
             # creating BeautifulSoup object for parsing
             soup = BeautifulSoup(page, "html.parser")
             # getting product name
-            name = soup.find(attrs={"class": "css-1g2jq23"}).string
-            if name:
-                # getting product brand
-                brand = soup.find(attrs={"class": "css-cjz2sh"}).string
-                # getting star rating as percentage
-                stars_object = soup.find(attrs={"class": "css-dtomnp"})
-                stars = str(stars_object["style"].strip("%").split(":")[-1])
-                # getting price from sephora page
-                price_string = soup.find(attrs={"class": "css-18suhml"}).string
-                if price_string == None:
-                    price = str(0)
-                else:
-                    price = str(price_string.strip("$"))
+            name_object = soup.find(attrs={"class": "css-1g2jq23"})
+            if name_object:
+                name = name_object.string
+                print(name)
                 # getting category information
-                category_1_2 = soup.find_all(attrs={"class": "css-u2mtre"})
-                category_1 = category_1_2[0].string
-                category_2 = category_1_2[1].string
-                category_3 = soup.find(attrs={"class": "css-j60h5s"}).string
-                # product box contains all product information inculding ingredients
-                product_box = soup.find_all(attrs={'class': 'css-1juot2r'})
-                ingredients_all = product_box[-1].text
-                ingredients_list = ingredients_all.split("\n")
-                if len(ingredients_list[-1]) < 1:
-                    ingredients = ingredients_list[-2].rstrip(".")
+                category = soup.find(attrs={"class": "css-j60h5s"}).string
+                if category != "Skincare":
+                    # getting product brand
+                    brand = soup.find(attrs={"class": "css-cjz2sh"}).string
+                    # getting star rating as percentage
+                    stars_object = soup.find(attrs={"class": "css-dtomnp"})
+                    stars = str(stars_object["style"].strip("%").split(":")[-1])
+                    # getting price from sephora page
+                    price_string = soup.find(attrs={"class": "css-18suhml"}).string
+                    if price_string == None:
+                        price = str(0)
+                    else:
+                        price = str(price_string.strip("$"))
+                    # product box contains all product information inculding ingredients
+                    product_box = soup.find_all(attrs={'class': 'css-1juot2r'})
+                    ingredients_all = product_box[-1].text
+                    ingredients_list = ingredients_all.split("\n")
+                    if len(ingredients_list[-1]) < 1:
+                        ingredients = ingredients_list[-2].rstrip(".")
+                    else:
+                        ingredients = ingredients_list[-1].rstrip(".")
+                    images = soup.select('div.css-t6rz1k > svg > image')
+                    for image in images:
+                        image_url = f"https://www.sephora.com{image.get('xlink:href')}"
+                    # creating product instance
+                    product = Product(sephora_url=url, 
+                              pr_name=name, 
+                              brand=brand, 
+                              stars=float(stars), 
+                              price=float(price),
+                              category=category,  
+                              image_url=image_url, 
+                              ingredients_list=ingredients)
+                    db.session.add(product)
                 else:
-                    ingredients = ingredients_list[-1].rstrip(".")
-                # creating product instance
-                product = Product(sephora_url=url, 
-                          pr_name=name, 
-                          pr_name_lower=name.lower(), 
-                          brand=brand, 
-                          brand_lower=brand.lower(),
-                          stars=float(stars), 
-                          price=float(price),
-                          category_1=category_1, 
-                          category_2=category_2, 
-                          category_3=category_3, 
-                          ingredients_list=ingredients)
-                db.session.add(product)
+                    print("***NO CATEGORY***")
             else:
                 print("***ERROR***")
                 print(url)
-                return
+
+    print("****Donezo!****")
     db.session.commit()
 
 
@@ -219,11 +222,11 @@ if __name__ == "__main__":
     db.create_all()
 
 
-    load_products("test_seed_data/test_valid_skin_urls.txt")
-    load_ingredients()
-    load_product_ingredients()
-    load_flags("test_seed_data/test_flags.txt")
-    load_ingredient_flags()
+    load_products("seed_data/valid_skin_urls.txt")
+    # load_ingredients()
+    # load_product_ingredients()
+    # load_flags("test_seed_data/test_flags.txt")
+    # load_ingredient_flags()
 
 
 

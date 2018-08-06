@@ -16,22 +16,17 @@ class Product(db.Model):
                            autoincrement=True, 
                            primary_key=True)
     pr_name = db.Column(db.String(1000))
-    pr_name_lower = db.Column(db.String(1000))
     brand = db.Column(db.String(1000), 
                       nullable=True)
-    brand_lower = db.Column(db.String(1000), 
-                            nullable=True)
     sephora_url = db.Column(db.String(1000))
     stars = db.Column(db.Integer, 
                       nullable=True)
     price = db.Column(db.Integer, 
                       nullable=True)
-    category_1 = db.Column(db.String(150), 
+    category = db.Column(db.String(150), 
                            nullable=True)
-    category_2 = db.Column(db.String(150), 
-                           nullable=True)
-    category_3 = db.Column(db.String(150), 
-                           nullable=True)
+    image_url = db.Column(db.String(1000),
+                          nullable=True)
     ingredients_list = db.Column(db.String(500000),
                                  nullable=True)
 
@@ -66,8 +61,7 @@ class Ingredient(db.Model):
     ingredient_id = db.Column(db.Integer, 
                               autoincrement=True, 
                               primary_key=True)
-    ing_name = db.Column(db.String(75))
-    ing_name_lower = db.Column(db.String(75))
+    ing_name = db.Column(db.String(300))
     synonym = db.Column(db.String(200), 
                         nullable=True)
     synonym_lower = db.Column(db.String(200), 
@@ -180,28 +174,6 @@ class Ingredient_Flag(db.Model):
         """For easier id when printing"""
 
         return f"<Ingredient Flag ingredient flag={self.ing_flag_id}>"
-
-
-class Category(db.Model):
-    """Canadian ingredient flags and notes"""
-
-    __tablename__ = "categories"
-
-    category_id = db.Column(db.Integer, 
-                           autoincrement=True, 
-                           primary_key=True)
-    product_id = db.Column(db.Integer, 
-                        db.ForeignKey("products.product_id"))
-    broad = db.Column(db.String(50))
-    middle = db.Column(db.String(75), 
-                       nullable=True)
-    specific = db.Column(db.String(100), 
-                       nullable=True)
-
-    def __repr__(self):
-        """For easier id when printing"""
-
-        return f"<Category category={self.broad}/{self.middle}/{self.specific}>"
 
 
 def connect_to_db(app):

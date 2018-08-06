@@ -5,7 +5,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, Category
+from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag
 
 from search import search_by_product, search_by_ingredient, search_by_brand, search_by_ingredient_and_brand
 
@@ -190,3 +190,6 @@ if __name__ == "__main__":
     DebugToolbarExtension(app)
 
     app.run(host="0.0.0.0")
+
+
+    
