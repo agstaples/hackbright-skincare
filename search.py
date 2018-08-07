@@ -4,85 +4,99 @@ from fuzzywuzzy import process, fuzz
 from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag
 
 
-
-def search_by_ingredient(user_ingredient_search):
-    """takes in ingredient string and returns list of product objects"""
-
-    ingredients = Ingredient.query.all()
-    choices = []
-    for ingredient in ingredients:
-        choices.append(ingredient.ing_name)
-    # fuzzy search with a cutoff score of 85
-    match = process.extractOne(user_ingredient_search, choices, scorer=fuzz.ratio, score_cutoff = 85) 
-    if match:
-        ingredient = Ingredient.query.filter_by(ing_name=match[0]).first()
-        return ingredient.ing_products
-    else:
-        return None
-
-
-def search_by_brand(user_brand_search):
+def search_by_term(user_query):
     """takes in brand string and returns list of product objects"""
 
-    products = Product.query.all()
-    choices = []
-    for product in products:
-        choices.append(product.brand)
-    # fuzzy search with a cutoff score of 95
-    match = process.extractOne(user_brand_search, choices, scorer=fuzz.ratio, score_cutoff = 75) 
-    if match:
-        return Product.query.filter_by(brand=match[0]).all()
-    else:
-        return None
+    products_all = Product.query
 
-
-def search_by_product(user_product_search):
-    """takes in product name string and returns list with single product"""
-
-    products = Product.query.all()
-    choices = []
-    for product in products:
-        choices.append(product.pr_name)
-    # fuzzy search with a cutoff score of 90
-    match = process.extractOne(user_product_search, choices, scorer=fuzz.ratio, score_cutoff = 75)  
-    if match:
-        return Product.query.filter_by(pr_name=match[0]).all()
-    else:
-        return None
-
-
-def search_by_ingredient_and_brand(user_ingredient_search, user_brand_search):
-    """takes in ingredient string and brand string and returns list of product objects"""
-
-    
-    # ingredient_choices = Ingredient.query(ing_name).all()
-    # brand_choices = Product.query(brand).all()
-
-    ingredients = Ingredient.query.all()
-    ingredient_choices = []
-    for ingredient in ingredients:
-        ingredient_choices.append(ingredient.ing_name)
-
-    products = Product.query.all()
+    product_choices = []
     brand_choices = []
-    for product in products:
-        brand_choices.append(product.brand)
-    
-    # fuzzy ingredient search with a cutoff score of 90
-    ingredient_match = process.extractOne(user_ingredient_search, ingredient_choices, scorer=fuzz.ratio, score_cutoff = 85) 
-    if ingredient_match:
-        ingredient = Ingredient.query.filter_by(ing_name=match).first()
-        ingredient_products = ingredient.ing_products
-        # fuzzy ingredient search with a cutoff score of 95
-        brand_match = process.extractOne(user_brand_search, brand_choices, scorer=fuzz.ratio, score_cutoff = 75) 
-        if brand_match:
-            brand_ingredient_match_products = []
-            for product in ingredient_products:
-                if product.brand == brand_match:
-                    brand_ingredient_match_products.append(product)
-            return brand_ingredient_match_products
+    category_choices = []
 
-    return None
+    for product in products_all:
+        product_choices.append(product.pr_name)
+        brand_choices.append(product.brand)
+        category_choices.append(product.category)
+
+    product_matches = process.extract(user_query, product_choices, scorer=fuzz.partial_ratio, limit = 40) 
+    brand_matches = process.extract(user_query, brand_choices, scorer=fuzz.partial_ratio, limit = 10) 
+    category_matches = process.extract(user_query, category_choices, scorer=fuzz.partial_ratio, limit = 5) 
+
+    # determine closest match
+    product_match_score = product_matches[0][1]
+    brand_match_score = brand_matches[0][1]
+    category_match_score = category_matches[0][1]
+
+    highest_match = "product"
+    if category_match_score >= brand_match_score:
+        if category_match_score >= product_match_score:
+            highest_match = "category"
+        else:
+            highest_match = "product"
+    elif brand_match_score >= category_match_score:
+        if brand_match_score >= product_match_score:
+            highest_match = "brand"
+        else:
+            highest_match = "product"
+
+    products = []
+    product_names = []
+    if product_matches:
+        for product in product_matches:
+            products.append(products_all.filter(Product.pr_name == product[0]).all())
+
+    brands = []
+    if brand_matches:
+        for brand in brand_matches:
+            products.append(products_all.filter(Product.brand == brand[0]).all())
+            brands.append(brand[0])
+
+    categories = []
+    if category_matches:
+        for category in category_matches:
+            products.append(products_all.filter(Product.category == category[0]).all())
+            categories.append(category[0])
+
+    if len(products) > 0:
+        products_return = list(set([product for product_list in products for product in product_list]))
+        return (products_return, brands, categories, highest_match)
+
+    else:
+        return None
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

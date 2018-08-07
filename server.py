@@ -7,7 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, products_schema
 
-from search import search_by_product, search_by_ingredient, search_by_brand, search_by_ingredient_and_brand
+from search import search_by_term
 
 
 # from forms import Registration_Form, Login_Form, User_Flag_Form, Search_Form
@@ -262,7 +262,7 @@ if __name__ == "__main__":
     # Use the DebugToolbar
     DebugToolbarExtension(app)
 
-    app.run(host="0.0.0.0")
+    # app.run(host="0.0.0.0")
 
 
     
