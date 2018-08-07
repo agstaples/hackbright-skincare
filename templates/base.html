@@ -1,33 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>sPYence</title>
+    <title>WORKING TITLE</title>
 <!--     <link rel="stylesheet" href="...link to .css..." -->
     <script src="http://code.jquery.com/jquery.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $("#brand_ing_submit_btn").click(function() {
-                debugger;
-                getInformationFromBackend();
-                // get information via POST ca..
-            })
-        })
+<!--     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
 
-        function getInformationFromBackend(){
-            $.get( "/search_results", function( data ) {
-              $( ".result" ).html( data );
-              alert( "Load was performed." );
-            });            
-        }
-        function addInformationToPage(data){
-
-        }
-    </script>
 </head>
 <body>
 
-<h1>sPYence</h1>
+<h1>WORKING HEADER</h1>
 
 {% if 'user_id' in session %}
     <a href='/logout'>Logout</a>
@@ -44,8 +26,6 @@
 BODY CONTENT GOES HERE
 
 {% endblock %}
-<div class="result">
 
-</div>
 </body>
 </html>

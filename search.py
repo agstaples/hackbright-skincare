@@ -55,8 +55,8 @@ def search_by_ingredient_and_brand(user_ingredient_search, user_brand_search):
     """takes in ingredient string and brand string and returns list of product objects"""
 
     
-    ingredient_choices = Ingredient.query(ing_name).all()
-    brand_choices = Product.query(brand).all()
+    # ingredient_choices = Ingredient.query(ing_name).all()
+    # brand_choices = Product.query(brand).all()
 
     ingredients = Ingredient.query.all()
     ingredient_choices = []

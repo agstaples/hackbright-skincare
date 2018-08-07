@@ -1,21 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
 
-
     <h2>Search</h2>
-    <form action="/search" method="POST">
+    <form action="/search_results.json" method="POST" id="search_form">
         <div>
             <label>Search by Ingredient and/or Brand:<br>
-                Ingredient: <input type="text" name="user_ingredient_search"><br>
-                Brand: <input type="text" name="user_brand_search">
+                Ingredient: <input id="ing_field" type="text" name="user_ingredient_search"><br>
+                Brand: <input id ="br_field" type="text" name="user_brand_search">
             </label>
         </div>
         <div>
-            <button id="brand_ing_submit_btn" class="submit_btn">Ingredient and/or Brand Search</button><br><br>
+            <input type="submit" name="submit_btn" value="ing_brand_search" id="brand_ing_submit_btn"><br><br>
         </div>
     </form>
 
-    <form action="/search" method="POST">
+    <div class="result">    :(    </div>
+
+<!--     <form action="/search" method="POST">
         <div>
             <label>Or Search by Product Name:<br>
                 <input type="text" name="user_product_search"><br>
@@ -23,10 +24,36 @@
         </div>
         
         <div>
-            <button id="pr_submit_btn" class="submit_btn">Product Search</button><br><br>
+            <input type="submit" name="submit_btn" value="product_search">
         </div>
-    </form>  
+    </form>   -->
 
-    <div id="search_results_table">***Display Search Results***</div>
+    <script>
+
+        function renderProducts(response){
+            let response_string = "";
+            let products = response["products"];
+            for (let product of products) {
+                response_string = response_string + product["pr_name"] + ": <br><img src=" + product["image_url"] + "><br>";
+            };
+            $('.result').html(response_string);
+        }
+
+        function submitSearch(evt) {
+            evt.preventDefault();
+
+            let formInputs = {
+                "ingredient": $("#ing_field").val(),
+                "brand": $("#br_field").val(),
+            };
+
+            $.post('/search_results.json', 
+                   formInputs, 
+                   renderProducts);
+        }
+
+        $('#search_form').on('submit', submitSearch);
+ 
+    </script>
 
 {% endblock %}

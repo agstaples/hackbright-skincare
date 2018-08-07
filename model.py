@@ -1,12 +1,14 @@
 """Models and database functions"""
 
 from flask_sqlalchemy import SQLAlchemy
+from marshmallow import Schema, fields
 
 
 db = SQLAlchemy()
 
 
-# table definitions:
+###### MODELS ######
+
 class Product(db.Model):
     """Sephora product info and ingredients list"""
 
@@ -175,6 +177,26 @@ class Ingredient_Flag(db.Model):
 
         return f"<Ingredient Flag ingredient flag={self.ing_flag_id}>"
 
+
+###### SCHEMA ######
+
+class ProductSchema(Schema):
+    """Product table schema"""
+
+    product_id = fields.Int(dump_only=True)
+    pr_name = fields.Str()
+    brand = fields.Str()
+    sephora_url = fields.Str()
+    stars = fields.Int()
+    price = fields.Int()
+    category = fields.Str()
+    image_url = fields.Str()
+
+
+products_schema = ProductSchema(many=True)
+
+
+###### DB ######
 
 def connect_to_db(app):
     """Connect database to Flask app"""

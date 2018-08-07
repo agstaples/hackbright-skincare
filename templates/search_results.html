@@ -5,7 +5,7 @@
     <table>
     <tbody>
         {% for product in response %}
-            <br>{{ product.brand }}: {{ product.pr_name }}<br>
+            <br><img src="{{ product.image_url }}">{{ product. {{ product.brand }}: {{ product.pr_name }}<br>
             {% for flag in product.get_flags() %} 
                 ~~~~ {{ flag.name }}<br>
             {% endfor %}
