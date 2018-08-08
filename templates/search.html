@@ -4,7 +4,7 @@
     <h2>Search</h2>
     <form action="/search_results.json" method="POST" id="search_form">
         <div>
-            Search: <input id="search_field" type="text" name="user_search"><br>
+            Search: <input id="user_search" type="text" name="user_search"><br>
         </div>
         <div>
             <input type="submit" name="submit_btn" value="user_search" id="user_search_submit_btn"><br><br>
@@ -31,7 +31,7 @@
             let response_string = "";
             let products = response["products"];
             for (let product of products) {
-                response_string = response_string + product["pr_name"] + ": <br><img src=" + product["image_url"] + "><br>";
+                response_string = response_string + product["pr_name"] + " / " + product["brand"] + " / " + product["category"] + ": <br><img src=" + product["image_url"] + "><br>";
             };
             $('.result').html(response_string);
         }
@@ -40,8 +40,7 @@
             evt.preventDefault();
 
             let formInputs = {
-                "ingredient": $("#ing_field").val(),
-                "brand": $("#br_field").val(),
+                "user_search": $("#user_search").val(),
             };
 
             $.post('/search_results.json', 

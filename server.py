@@ -131,13 +131,8 @@ def return_search_results():
 
     # flash error or render search results based on search results
     if search_response:
-        print(search_response[3])
-        print(search_response[4])
-        print(search_response[5])
-        print(search_response[6])
         serialized_response = products_schema.dump(search_response[0])
         json_object = jsonify(products = serialized_response)
-        print(json_object)
         return json_object
 
     else:
