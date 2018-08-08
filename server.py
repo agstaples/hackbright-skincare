@@ -10,15 +10,11 @@ from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, Us
 from search import search_by_term
 
 
-# from forms import Registration_Form, Login_Form, User_Flag_Form, Search_Form
-
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
 app.secret_key = "ABC"
 
-# Normally, if you use an undefined variable in Jinja2, it fails silently.
-# This is horrible. Fix this so that, instead, it raises an error.
 app.jinja_env.undefined = StrictUndefined
 
 
@@ -112,59 +108,6 @@ def show_product_search():
     return render_template("search.html")
 
 
-# @app.route("/search", methods=["POST"])
-# def process_product_search():
-#     """Processes search"""
-
-#     # getting search terms from form
-#     # if doing brand/ingredient search: set product_search to empty
-#     if request.form["submit_btn"] == "ing_brand_search":
-#         user_ingredient_search = request.form["user_ingredient_search"]
-#         session["ingredient_search"] = user_ingredient_search.lower()
-#         user_brand_search = request.form["user_brand_search"]
-#         session["brand_search"] = user_brand_search.lower()
-#         session["product_search"] = ""
-#     # if doing product search: set ingredient_search and brand_search to empty
-#     elif request.form["submit_btn"] == "product_search":
-#         user_product_search = request.form["user_product_search"]
-#         session["product_search"] = user_product_search.lower()
-#         session["ingredient_search"] = ""
-#         session["brand_search"] = ""
-
-
-# @app.route("/search_results")
-# def show_search_results():
-#     """show search results"""
-
-#     # getting relevant product information from product name
-#     if session["product_search"] != "":
-#         user_product_search = session["product_search"]
-#         response = search_by_product(user_product_search)
-
-#     # getting relevant product information from ingredient and no brand
-#     elif session["ingredient_search"] != "" and session["brand_search"] == "":
-#         user_ingredient_search = session["ingredient_search"]
-#         response = search_by_ingredient(user_ingredient_search)
-
-#     # getting relevant product information from brand and no ingredient
-#     elif session["brand_search"] != "" and session["ingredient_search"] == "":
-#         user_brand_search = session["brand_search"]
-#         response = search_by_brand(user_brand_search)
-
-#     # getting relevant product information from ingredient and brand
-#     elif session["brand_search"] != "" and session["ingredient_search"] != "":
-#         user_ingredient_search = session["ingredient_search"]
-#         user_brand_search = session["brand_search"]
-#         response = search_by_ingredient_and_brand(user_ingredient_search, user_brand_search)
-
-#     # flash error or render search results based on search results
-#     if response:
-#         return render_template("search_results.html", 
-#                            response=response)
-#     else:
-#         flash("It doesn't look like that was a valid search. Please try again.")
-#         return redirect("/search")
-
 @app.route("/user_flag")
 def show_custom_flag_form():
     """Shows form for user to create custom flag"""
@@ -181,71 +124,21 @@ def create_custom_flag():
 def return_search_results():
     """Returns search results as json to render on /search page"""
 
-    # getting search terms from form
-    # if doing brand/ingredient search: set product_search to empty
-    # if request.form["submit_btn"] == "ing_brand_search":
-    #     user_ingredient_search = request.form["user_ingredient_search"]
-    #     session["ingredient_search"] = user_ingredient_search.lower()
-    #     user_brand_search = request.form["user_brand_search"]
-    #     session["brand_search"] = user_brand_search.lower()
-    #     session["product_search"] = ""
-    # # if doing product search: set ingredient_search and brand_search to empty
-    # elif request.form["submit_btn"] == "product_search":
-    #     user_product_search = request.form["user_product_search"]
-    #     session["product_search"] = user_product_search.lower()
-    #     session["ingredient_search"] = ""
-    #     session["brand_search"] = ""
+    user_query = request.form.get("user_search")
 
-
-    # if request.form.get("ingredient"):
-    #     ingredient = request.form.get("ingredient")
-    #     session["ingredient_search"] = ingredient
-    # else: 
-    #     session["ingredient_search"] = ""
-
-    print("IN ROUTE")
-
-    brand = request.form.get("brand")
-    session["brand_search"] = brand
-
-
-    session["product_search"] = ""
-    session["ingredient_search"] = ""
-
-
-    # getting relevant product information from product name
-    if session["product_search"] != "":
-        user_product_search = session["product_search"]
-        response = search_by_product(user_product_search)
-
-    # getting relevant product information from ingredient and no brand
-    elif session["ingredient_search"] != "" and session["brand_search"] == "":
-        user_ingredient_search = session["ingredient_search"]
-        response = search_by_ingredient(user_ingredient_search)
-
-    # getting relevant product information from brand and no ingredient
-    elif session["brand_search"] != "" and session["ingredient_search"] == "":
-        user_brand_search = session["brand_search"]
-        response = search_by_brand(user_brand_search)
-
-    # getting relevant product information from ingredient and brand
-    elif session["brand_search"] != "" and session["ingredient_search"] != "":
-        user_ingredient_search = session["ingredient_search"]
-        user_brand_search = session["brand_search"]
-        response = search_by_ingredient_and_brand(user_ingredient_search, user_brand_search)
+    search_response = search_by_term(user_query)
+    # (products_return, brands, categories, highest_match, product_match_score, brand_match_score, category_match_score)
 
     # flash error or render search results based on search results
-    if response:
-        print(response)
-        serialized_response = products_schema.dump(response)
-        print(serialized_response)
-        # return jsonify({'products': render_template('search_jinja.html', product_list=serialized_response)})
+    if search_response:
+        print(search_response[3])
+        print(search_response[4])
+        print(search_response[5])
+        print(search_response[6])
+        serialized_response = products_schema.dump(search_response[0])
         json_object = jsonify(products = serialized_response)
-        # print(json_object)
+        print(json_object)
         return json_object
-        # print(response)
-        # print(type(response))
-        # return response
 
     else:
         flash("It doesn't look like that was a valid search. Please try again.")
@@ -262,7 +155,7 @@ if __name__ == "__main__":
     # Use the DebugToolbar
     DebugToolbarExtension(app)
 
-    # app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0")
 
 
     
