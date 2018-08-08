@@ -127,13 +127,30 @@ def return_search_results():
     user_query = request.form.get("user_search")
 
     search_response = search_by_term(user_query)
-    # (products_return, brands, categories, highest_match, product_match_score, brand_match_score, category_match_score)
+    # returns: (products, brands, categories, (match_1, match_2, match_3), product_match_score, brand_match_score, category_match_score)
 
     # flash error or render search results based on search results
     if search_response:
         serialized_response = products_schema.dump(search_response[0])
-        json_object = jsonify(products = serialized_response)
-        return json_object
+        brands = search_response[1]
+        categories = search_response[2]
+        rankings = search_response[3]
+        ranking = []
+        for rank in rankings:
+            ranking.append(rank)
+        return_response = jsonify(products=serialized_response, 
+                                   brands=brands, 
+                                   categories=categories, 
+                                   rank=ranking)
+        return return_response
+        # json_brands = jsonify(brands)
+        # json_categories = jsonify(categories)
+        # json_rank = jsonify(ranking)
+        # print(serialized_response)
+        # print(brands)
+        # print(categories)
+        # print(ranking)
+        # return (json_products, json_brands, json_categories, json_rank)
 
     else:
         flash("It doesn't look like that was a valid search. Please try again.")
