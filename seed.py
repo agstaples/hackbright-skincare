@@ -93,7 +93,7 @@ def create_product_ingredient_dictionary():
         for ingredient_single in ingredients_all:
             # cleaning up individual ingredientt and adding as values to dictionary
             ingredient_single = ingredient_single.strip(" ").rstrip(".\n").rstrip(".\r")
-            prod_ing_dict[product_id].append(ingredient_single.lower())
+            prod_ing_dict[product_id].append(ingredient_single)
 
     return prod_ing_dict
 
@@ -113,8 +113,7 @@ def load_ingredients():
 
     for ingredient in ingredient_list:
         # creating ingredient instance
-        ingredient = Ingredient(ing_name=ingredient, 
-                                ing_name_lower=ingredient.lower())
+        ingredient = Ingredient(ing_name=ingredient)
 
         db.session.add(ingredient)
 
@@ -173,7 +172,7 @@ def create_flag_ingredient_dictionary():
         for ingredient_single in ingredients_all:
             # cleaning up individual ingredientt and adding as values to dictionary
             ingredient_single = ingredient_single.strip(" ").rstrip(".\n").rstrip(".\r")
-            fl_ing_dict[flag_id].append(ingredient_single.lower())
+            fl_ing_dict[flag_id].append(ingredient_single)
 
     return fl_ing_dict
 
@@ -222,7 +221,7 @@ if __name__ == "__main__":
     db.create_all()
 
 
-    load_products("seed_data/valid_skin_urls.txt")
+    # load_products("seed_data/valid_skin_urls.txt")
     # load_ingredients()
     # load_product_ingredients()
     # load_flags("test_seed_data/test_flags.txt")

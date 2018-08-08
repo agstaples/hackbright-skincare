@@ -14,6 +14,7 @@
     <div class="result_1">    :D    </div>
     <div class="result_2">    :D    </div>
     <div class="result_3">    :D    </div>
+    <div class="result_4">    :D    </div>
 
 
     <script>
@@ -22,10 +23,12 @@
 
             let prods_string = "";
             let brands_string = "";
-            let categories_string = "";
+            let cats_string = "";
+            let ings_string = ""
             let products = response["products"];
             let brands = response["brands"];
             let categories = response["categories"]
+            let ingredients = response["ingredient_names"]
             let rankings = response["rank"]
 
             for (let product of products) {
@@ -38,7 +41,11 @@
             };
 
             for (let category of categories) {
-                categories_string = categories_string + category;
+                cats_string = cats_string + category;
+            };
+
+            for (let ingredient of ingredients) {
+                ings_string = ings_string + ingredient;
             };
 
             if (rankings[0] == "product") {
@@ -46,7 +53,9 @@
             } else if (rankings[0] == "brand") {
                 $('.result_1').html(brands_string);
             } else if (rankings[0] == "category") {
-                $('.result_1').html(categories_string);
+                $('.result_1').html(cats_string);
+            } else if (rankings[0] == "ingredient") {
+                $('.result_1').html(ings_string);
             };
 
             if (rankings[1] == "product") {
@@ -54,7 +63,9 @@
             } else if (rankings[1] == "brand") {
                 $('.result_2').html(brands_string);
             } else if (rankings[1] == "category") {
-                $('.result_2').html(categories_string);
+                $('.result_2').html(cats_string);
+            } else if (rankings[1] == "ingredient") {
+                $('.result_2').html(ings_string);
             };
 
             if (rankings[2] == "product") {
@@ -62,7 +73,19 @@
             } else if (rankings[2] == "brand") {
                 $('.result_3').html(brands_string);
             } else if (rankings[2] == "category") {
-                $('.result_3').html(categories_string);
+                $('.result_3').html(cats_string);
+            } else if (rankings[2] == "ingredient") {
+                $('.result_3').html(ings_string);
+            };
+
+            if (rankings[3] == "product") {
+                $('.result_4').html(prods_string);
+            } else if (rankings[3] == "brand") {
+                $('.result_4').html(brands_string);
+            } else if (rankings[3] == "category") {
+                $('.result_4').html(cats_string);
+            } else if (rankings[3] == "ingredient") {
+                $('.result_4').html(ings_string);
             };
         }
 

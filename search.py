@@ -9,10 +9,12 @@ def search_by_term(user_query):
 
     # getting all products for querying
     products_all = Product.query
+    ingredients_all = Ingredient.query
 
     product_choices = []
     brand_choices_dup = []
     category_choices_dup = []
+    ingredient_choices = []
 
     # create and dedupe lists of choices for fuzzy search to compare user query against
     for product in products_all:
@@ -21,37 +23,28 @@ def search_by_term(user_query):
         category_choices_dup.append(product.category)
         brand_choices = list(set(brand_choices_dup))
         category_choices = list(set(category_choices_dup))
+    for ingredient in ingredients_all:
+        ingredient_choices.append(ingredient.ing_name)
 
     # get match scores
     product_matches = process.extract(user_query, product_choices, scorer=fuzz.partial_ratio, limit = 20) 
     brand_matches = process.extract(user_query, brand_choices, scorer=fuzz.partial_ratio, limit = 10) 
     category_matches = process.extract(user_query, category_choices, scorer=fuzz.partial_ratio) 
+    ingredient_matches = process.extract(user_query, ingredient_choices, scorer=fuzz.ratio, limit = 15)
 
     # determine closest match
     product_match_score = product_matches[0][1]
     brand_match_score = brand_matches[0][1]
     category_match_score = category_matches[0][1]
+    ingredient_match_score = ingredient_matches[0][1]
 
-    match_1 = "product"
-    match_2 = "brand"
-    match_3 = "category"
+    match_scores_all = [(product_match_score, "product"), (brand_match_score, "brand"), (category_match_score, "category"), (ingredient_match_score, "ingredient")]
+    sorted_match_scores_all = sorted(match_scores_all, key=lambda tup: tup[0])
 
-    if category_match_score >= brand_match_score and category_match_score >= product_match_score:
-        match_1 = "category"
-        if brand_match_score >= product_match_score:
-            match_2 = "brand"
-            match_3 = "product"
-        else:
-            match_2 = "product"
-            match_3 = "brand"
-    elif brand_match_score >= category_match_score and brand_match_score >= product_match_score:
-        match_1 = "brand"
-        if category_match_score >= product_match_score:
-            match_2 = "category"
-            match_3 = "product"
-        else:
-            match_2 = "product"
-            match_3 = "category"
+    match_1 = sorted_match_scores_all[3][1]
+    match_2 = sorted_match_scores_all[2][1]
+    match_3 = sorted_match_scores_all[1][1]
+    match_4 = sorted_match_scores_all[0][1]
 
     # create list of product objects
     products = []
@@ -74,9 +67,20 @@ def search_by_term(user_query):
         for category in category_matches:
             categories.append(category[0])
 
+    # create list of ingredients objects
+    ingredients = []
+    ingredient_names = []
+    if ingredient_matches:
+        for ingredient in ingredient_matches:
+            ings = ingredients_all.filter(Ingredient.ing_name == ingredient[0]).all()
+            for ing in ings:
+                if ing not in ingredients:
+                    ingredients.append(ing)
+                    ingredient_names.append(ing.ing_name)
+
     # if there are objects in products list, return info for rendering, else return None to prompt error message
     if len(products) > 0:
-        return (products, brands, categories, (match_1, match_2, match_3), product_match_score, brand_match_score, category_match_score)
+        return (products, brands, categories, (match_1, match_2, match_3, match_4), ingredients, ingredient_names)
 
     else:
         return None

@@ -63,7 +63,7 @@ class Ingredient(db.Model):
     ingredient_id = db.Column(db.Integer, 
                               autoincrement=True, 
                               primary_key=True)
-    ing_name = db.Column(db.String(300))
+    ing_name = db.Column(db.String(3000))
     synonym = db.Column(db.String(200), 
                         nullable=True)
     synonym_lower = db.Column(db.String(200), 
