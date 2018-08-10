@@ -5,7 +5,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, products_schema
+from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, products_schema, ingredients_schema
 
 from search import search_by_term
 
@@ -127,23 +127,24 @@ def return_search_results():
     user_query = request.form.get("user_search")
 
     search_response = search_by_term(user_query)
-    # returns: (products, brands, categories, (match_1, match_2, match_3, match_4), ingredients, ingredient_names)
+    # returns: (products, brands, categories, (match_1, match_2, match_3, match_4), ingredients)
 
     # flash error or render search results based on search results
     if search_response:
-        serialized_response = products_schema.dump(search_response[0])
+        prods_serialized_response = products_schema.dump(search_response[0])
+        ings_serialized_response = ingredients_schema.dump(search_response[4])
         brands = search_response[1]
         categories = search_response[2]
         rankings = search_response[3]
-        ingredient_names = search_response[5]
         ranking = []
         for rank in rankings:
             ranking.append(rank)
-        return_response = jsonify(products=serialized_response, 
+        return_response = jsonify(products=prods_serialized_response, 
                                    brands=brands, 
                                    categories=categories, 
-                                   ingredient_names=ingredient_names, 
+                                   ingredients=ings_serialized_response, 
                                    rank=ranking)
+        print(ings_serialized_response)
         return return_response
 
 

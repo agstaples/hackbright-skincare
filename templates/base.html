@@ -4,18 +4,42 @@
     <title>WORKING TITLE</title>
 <!--     <link rel="stylesheet" href="...link to .css..." -->
     <script src="http://code.jquery.com/jquery.js"></script>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+    <link href="/static/project.css" rel="stylesheet">
 
 </head>
 <body>
 
-<h1>WORKING HEADER</h1>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">sPYence</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+    <ul class="navbar-nav ml-auto">
+      <li>
+        <form action="/search_results.json" method="POST" id="search_form" class="form-inline my-2 my-lg-0">
+          <input class="form-control mr-sm-2" type="search" placeholder="" aria-label="Search" id="user_search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id="user_search_btn">Search</button>
+        </form>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Flags</a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="#">Create Custom Flag</a>
+          <a class="dropdown-item" href="#">Edit Custom Flag</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#">Disable/Enable Flag</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
 
-{% if 'user_id' in session %}
-    <a href='/logout'>Logout</a>
-{% else %}
-    <a href='/login'>Login</a>
-{% endif %}
 
 {% for flash in get_flashed_messages() %}
     {{ flash }}
@@ -26,6 +50,11 @@
 BODY CONTENT GOES HERE
 
 {% endblock %}
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
 </body>
 </html>

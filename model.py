@@ -66,8 +66,6 @@ class Ingredient(db.Model):
     ing_name = db.Column(db.String(3000))
     synonym = db.Column(db.String(200), 
                         nullable=True)
-    synonym_lower = db.Column(db.String(200), 
-                              nullable=True)
 
     ing_products = db.relationship("Product",
                                secondary="join(Product_Ingredient, Product, Product_Ingredient.product_id == Product.product_id)", 
@@ -178,7 +176,32 @@ class Ingredient_Flag(db.Model):
         return f"<Ingredient Flag ingredient flag={self.ing_flag_id}>"
 
 
-###### SCHEMA ######
+###### SCHEMAS ######
+
+
+class FlagSchema(Schema):
+    """Flag table schema"""
+
+    flag_id = fields.Int(dump_only=True)
+    name = fields.Str()
+    description = fields.Str()
+    ingredients_list = fields.Str()
+
+flags_schema = FlagSchema(many=True)
+
+
+
+class IngredientSchema(Schema):
+    """Ingredient table schema"""
+
+    ingredient_id = fields.Int(dump_only=True)
+    ing_name = fields.Str()
+    synonym = fields.Str()
+    ing_flags = fields.Nested(FlagSchema, many=True)
+
+ingredients_schema = IngredientSchema(many=True)
+
+
 
 class ProductSchema(Schema):
     """Product table schema"""
@@ -191,9 +214,10 @@ class ProductSchema(Schema):
     price = fields.Int()
     category = fields.Str()
     image_url = fields.Str()
-
+    prod_ingredients = fields.Nested(IngredientSchema, many=True)
 
 products_schema = ProductSchema(many=True)
+
 
 
 ###### DB ######

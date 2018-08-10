@@ -1,20 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 
-    <h2>Search</h2>
-    <form action="/search_results.json" method="POST" id="search_form">
-        <div>
-            Search: <input id="user_search" type="text" name="user_search"><br>
-        </div>
-        <div>
-            <input type="submit" name="submit_btn" value="user_search" id="user_search_submit_btn"><br><br>
-        </div>
-    </form>
 
     <div class="result_1">    :D    </div>
     <div class="result_2">    :D    </div>
     <div class="result_3">    :D    </div>
     <div class="result_4">    :D    </div>
+
+    <img src="https://goo.gl/images/3xHfeo">
 
 
     <script>
@@ -25,14 +18,16 @@
             let brands_string = "";
             let cats_string = "";
             let ings_string = ""
+            let flags_string = ""
+            let prod_ing_string = ""
             let products = response["products"];
             let brands = response["brands"];
             let categories = response["categories"]
-            let ingredients = response["ingredient_names"]
+            let ingredients = response["ingredients"]
             let rankings = response["rank"]
 
             for (let product of products) {
-                prods_string = prods_string + product["pr_name"] + " / " + product["brand"] + " / " + product["category"] + ": <br><img src=" + product["image_url"] + "><br>";
+                prods_string = prods_string + product.pr_name + " / " + product.brand + " : <br><img src=" + product.image_url + "><br>";
             };
             
             for (let brand of brands) {
@@ -43,9 +38,11 @@
             for (let category of categories) {
                 cats_string = cats_string + category;
             };
-
             for (let ingredient of ingredients) {
-                ings_string = ings_string + ingredient;
+                for (let flag of ingredient["ing_flags"]) {
+                    ingredient["ing_flags"] = flag["name"];
+                };
+                ings_string = ings_string + ingredient["ing_name"] + " / " + ingredient["ing_flags"] + "<br>";
             };
 
             if (rankings[0] == "product") {
@@ -87,6 +84,7 @@
             } else if (rankings[3] == "ingredient") {
                 $('.result_4').html(ings_string);
             };
+            debugger;
         }
 
         function submitSearch(evt) {
