@@ -5,7 +5,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, products_schema, ingredients_schema
+from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, products_schema, ingredients_schema, flags_schema, users_schema
 
 from search import search_by_term
 
@@ -18,18 +18,19 @@ app.secret_key = "ABC"
 app.jinja_env.undefined = StrictUndefined
 
 
-@app.route("/")
-def homepage():
-    """Renders homepage"""
+@app.route("/user_validation.json")
+def check_for_user():
+    """CHecks if user is logged in"""
 
-    return render_template("homepage.html")
+    user_id = session.get("user_id")
 
+    
+    if user_id:
+        user = User.query.get(user_id)
+        user_serialized = users_schema.dump(user)
+        return jsonify(user=user_serialized)
 
-@app.route("/register")
-def show_registration_form():
-    """Registration form for new users"""
-
-    return render_template("registration.html")
+    return "No"
 
 
 @app.route("/register", methods=["POST"])
@@ -58,47 +59,40 @@ def process_registration():
     return redirect("/search")
 
 
-@app.route("/login")
-def show_login_form():
-    """Log in form for exisiting users"""
-
-    return render_template("login.html")
-
-
-@app.route("/login", methods=["POST"])
+@app.route("/user_login.json", methods=["POST"])
 def process_login():
     """Processes login form for existing users"""
 
-    email = request.form["email"]
-    password = request.form["password"]
+    user_query = request.form.get("user_search")
+
+    email = request.form.get("email")
+    password = request.form.get("password")
 
     # checking if user already exists in database
     user = User.query.filter_by(email=email).first()
 
     if not user:
-        flash("That email address does not exist in our files, please try again or click Register for new users.")
-        return redirect("/")
+        return "No"
 
     # checking if password valid
     if user.password != password:
-        flash(f"Welcome back {user.fname}! Please try your password again, that wasn't quite right.")
-        return redirect("/login")
+        return "No"
 
     # adding user to session
     session["user_id"] = user.user_id
 
-    flash("You're logged in. Let's get searching.")
-    return redirect("/search")
+    return user.fname
 
 
-@app.route("/logout")
+@app.route("/logout.json")
 def logout():
     """Logs out user"""
 
     # deleting user from session when they log out
     del session["user_id"]
-    flash("You're logged out. Bye for now.")
-    return redirect("/")
+    print("deleted")
+
+    return "You have successfully signed out"
 
 
 @app.route("/search")
@@ -107,18 +101,6 @@ def show_product_search():
 
     return render_template("search.html")
 
-
-@app.route("/user_flag")
-def show_custom_flag_form():
-    """Shows form for user to create custom flag"""
-
-    # shows user form for creating custom flags
-
-@app.route("/user_flag", methods=["POST"])
-def create_custom_flag():
-    """Creates custom user flag"""
-
-    # creates custom user flag and saves to database
 
 @app.route("/search_results.json", methods=["POST"])
 def return_search_results():
@@ -144,13 +126,48 @@ def return_search_results():
                                    categories=categories, 
                                    ingredients=ings_serialized_response, 
                                    rank=ranking)
-        print(ings_serialized_response)
         return return_response
 
 
-    else:
-        flash("It doesn't look like that was a valid search. Please try again.")
-        return redirect("/search")
+    return None
+
+
+@app.route("/user_flag_ing_check.json", methods=["POST"])
+def return_flag_close_ings():
+    """Returns search results as json to render on /search page"""
+
+    user_flag_name = request.form.get("user_flag_name")
+    user_flag_ings_input = request.form.get("user_flag_ings")
+    user_flag_ings_list = user_flag_ings_input.split(",")
+    user_flag_ings = []
+    for user_flag_ing in user_flag_ings_list:
+        user_flag_ing.strip()
+        user_flag_ings.append(user_flag_ing)
+
+    user_flag_response = return_close_ing_matches(user_flag_ings)
+    # returns: (auto_add_ing, confirm_add_ing)
+
+    # alert close matches under 99 and over 90 (100 and 99 included automatically)
+    if user_flag_response:
+        auto_add_ing_serialized = ingredients_schema.dump(search_response[0])
+        print(auto_add_ing_serialized)
+        confirm_add_ing_serialized = ingredients_schema.dump(search_response[1])
+
+        return_response = jsonify(confirm_add_ing=confirm_add_ing_serialized, 
+                                  auto_add_ing=auto_add_ing_serialized)
+        return return_response
+
+
+    return None
+
+
+@app.route("/user_flag_add.json", methods=["POST"])
+def add_user_flag():
+    """creates custom user flag in database"""
+
+
+
+
 
 
 if __name__ == "__main__":

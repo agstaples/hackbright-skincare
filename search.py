@@ -86,13 +86,34 @@ def search_by_term(user_query):
         return None
 
 
+def return_close_ing_matches(user_flag_ings):
+    """takes in ingredients for user custom flag and returns close matches"""
 
+    ingredients_all = Ingredient.query
 
+    ingredient_choices = []
 
+    for ingredient in ingredients_all:
+        ingredient_choices.append(ingredient.ing_name)
 
+    auto_add_ing = []
+    confirm_add_ing = []
 
+    # get match scores
+    for ing in user_flag_ings:
+        ingredient_matches = process.extract(ing, ingredient_choices, scorer=fuzz.ratio, limit = 15)
+        for fuzz_ing in ingredient_matches:
+            if fuzz_ing[1] >= 99:
+                auto_add_ing.append(fuzz_ing)
+            elif fuzz_ing[1] >= 90:
+                confirm_add_ing.append(fuzz_ing)
 
+    # if there are objects in either list, return those matches, else return None to prompt error message
+    if len(auto_add_ing) > 0 or len(confirm_add_ing) > 0:
+        return (auto_add_ing, confirm_add_ing)
 
+    else:
+        return None
 
 
 

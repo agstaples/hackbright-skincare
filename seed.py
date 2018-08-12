@@ -7,6 +7,7 @@ from sqlalchemy import func
 from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag
 from server import app
 import os
+from fuzzywuzzy import process, fuzz
 # from sephora_scrape import scrape_relevant_product_info
 
 def load_products(doc="seed_data/valid_skin_urls.txt"):
@@ -216,10 +217,35 @@ def load_categories(doc):
     db.session.commit()
 
 
+def fuzz_flag_ingredients(ingredients):
+    """Takes in list of flagged ingredients, returns list of 95% matches"""
+
+
+    ingredients_all = Ingredient.query.all()
+
+    ingredient_choices = []
+    match_dict = {}
+
+    for ingredient in ingredients_all:
+        ingredient_choices.append(ingredient.ing_name)
+
+    for ingredient in ingredients:
+        ingredient_matches = process.extract(ingredient, ingredient_choices, scorer=fuzz.partial_ratio, limit = 5)
+        match_dict[ingredient] = ingredient_matches
+
+    print(match_dict)
+
+
+ingredients_list = ['lead', 'triclosan', 'oxybenzone', 'bht', 'butylated hydroxyanisole', 'bha', 'butylated hydroxytoluene', 'coal tar', 'paraben', 'phthalates', 'formaldehyde', 'eda', 'dithanolamine', 'triethanolamine', 'toluene', 'retinoids', 'retin a', 'salycylic acid', 'bpa', 'bithionol', 'chlorofluorocarbon propellants', 'chloroform', 'hexachlorophene', 'mercury', 'methylene chloride', 'vinyl chloride', 'zirconium', 'talc', 'propyl paraben', 'butyl paraben', 'isopropyl paraben', 'isobutyl paraben', 'methyl paraben', 'diethanolamine', 'oleamide DEA', 'lauramide DEA', 'cocamide DEA', 'Avobenzone', 'homosalate', 'octisalate', 'octocrylene', 'oxybenzone', 'oxtinoxate', 'menthyl anthranilate', 'oxtocrylene', 'Salicylic acid', '3-hydroxypropionic acid', 'trethocanic acid', 'tropic acid', 'aluminum chloride hexahydrate', 'aluminium chlorohydrate', 'acetyl mercaptan', 'mercaptoacetate', 'mercaptoacetic acid', 'thiovanic acid', 'Dihydroxyacetone', 'ammonia', 'methylbenzene', 'toluol', 'antisal 1a', 'formaldehyde', 'quaternium-15', 'dimethyl-dimethyl', 'DMDM', 'hydantoin', 'imidazolidinyl urea', 'diazolidinyl urea', 'sodium hydroxymethylglycinate', '2-bromo-2-nitropropane-1,3-diol', 'bromopol', 'BzBP', 'DBP', 'DEP', 'DMP', 'diethyl phthalate', 'dibutyl phthalate', 'benzylbutyl phthalate', 'hydroquinone', 'idrochinone', 'quinol/1-4 dihydroxy benzene/1-4 hydroxy benzene', 'retinoic acid', 'retinyl palmitate', 'retinaldehyde', 'adapalene', 'tretinoin', 'tazarotene', 'isotretinoin', 'Vitamin A', 'Toluene', 'DHA', 'Thioglycolic acid', 'Beta hydroxy acid']
+
+
+
 if __name__ == "__main__":
     connect_to_db(app)
     db.create_all()
 
+    # once ingredients cleaned up, run this to update flags:
+    # fuzz_flag_ingredients(ingredients_list)
 
     # load_products("seed_data/valid_skin_urls.txt")
     # load_ingredients()

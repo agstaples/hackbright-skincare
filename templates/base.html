@@ -12,44 +12,275 @@
     <link href="/static/project.css" rel="stylesheet">
 
 </head>
-<body>
+<body onload="askServer()">
+    {% block navbar %}
+    <div id="navbar">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">sPYence</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+                <ul class="navbar-nav ml-auto">
+                    
+                    <li>
+                        <form action="/search_results.json" method="POST" id="search_form" class="form-inline my-2 my-lg-0">
+                        <input class="form-control mr-sm-2" type="search" placeholder="" aria-label="Search" id="user_search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id="user_search_btn">Search</button>
+                        </form>
+                    </li>
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="button" id="navbar_log_in_out_btn">Sign In</button>
+                    <li>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">sPYence</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
-    <ul class="navbar-nav ml-auto">
-      <li>
-        <form action="/search_results.json" method="POST" id="search_form" class="form-inline my-2 my-lg-0">
-          <input class="form-control mr-sm-2" type="search" placeholder="" aria-label="Search" id="user_search">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id="user_search_btn">Search</button>
-        </form>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Flags</a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="#">Create Custom Flag</a>
-          <a class="dropdown-item" href="#">Edit Custom Flag</a>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="#">Disable/Enable Flag</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Flags</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">Create Custom Flag</a>
+                            <a class="dropdown-item" href="#">Edit Custom Flag</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Disable/Enable Flag</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+
+<!-- login/registration popup -->
+    <div class="modal fade" id="modalLRForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog cascading-modal" role="document">
+            <!--Content-->
+            <div class="modal-content">
+
+                <!--Modal cascading tabs-->
+                <div class="modal-c-tabs">
+
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs tabs-2 light-blue darken-3" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#panel7" role="tab"><i class="fa fa-user mr-1"></i> Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#panel8" role="tab"><i class="fa fa-user-plus mr-1"></i> Register</a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab panels -->
+                    <div class="tab-content">
+                        <!--Panel 7-->
+                        <div class="tab-pane fade in show active" id="panel7" role="tabpanel">
+
+                            <!--Body-->
+                            <div class="modal-body mb-1">
+                                <form id="login_form">
+                                    <div class="md-form form-sm mb-5">
+                                        <i class="fa fa-envelope prefix"></i>
+                                        <input type="email" id="modalLRInput10" class="form-control form-control-sm validate">
+                                        <label data-error="wrong" data-success="right" for="modalLRInput10">Your email</label>
+                                    </div>
+
+                                    <div class="md-form form-sm mb-4">
+                                        <i class="fa fa-lock prefix"></i>
+                                        <input type="password" id="modalLRInput11" class="form-control form-control-sm validate">
+                                        <label data-error="wrong" data-success="right" for="modalLRInput11">Your password</label>
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <button class="btn btn-info" id="login_btn" type="submit">Log in <i class="fa fa-sign-in ml-1"></i></button>
+                                    </div>
+                                </form>
+                            </div>
+                            <!--Footer-->
+                            <div class="modal-footer">
+                                <div class="options text-center text-md-right mt-1">
+                                    <p>Not a member? <a href="#" class="blue-text">Sign Up</a></p>
+                                    <p>Forgot <a href="#" class="blue-text">Password?</a></p>
+                                </div>
+                                <button type="button" class="btn btn-outline-info waves-effect ml-auto" data-dismiss="modal">Close</button>
+                            </div>
+
+                        </div>
+                        <!--/.Panel 7-->
+
+                        <!--Panel 8-->
+                        <div class="tab-pane fade" id="panel8" role="tabpanel">
+
+                            <!--Body-->
+                            <div class="modal-body">
+                                <div class="md-form form-sm mb-5">
+                                    <i class="fa fa-envelope prefix"></i>
+                                    <input type="text" id="modalLRInput12" class="form-control form-control-sm validate">Your First Name</label>
+                                </div>
+
+                                <div class="md-form form-sm mb-5">
+                                    <i class="fa fa-envelope prefix"></i>
+                                    <input type="email" id="modalLRInput13" class="form-control form-control-sm validate">
+                                    <label data-error="wrong" data-success="right" for="modalLRInput12">Your email</label>
+                                </div>
+
+                                <div class="md-form form-sm mb-5">
+                                    <i class="fa fa-lock prefix"></i>
+                                    <input type="password" id="modalLRInput14" class="form-control form-control-sm validate">
+                                    <label data-error="wrong" data-success="right" for="modalLRInput13">Your password</label>
+                                </div>
+
+                                <div class="md-form form-sm mb-4">
+                                    <i class="fa fa-lock prefix"></i>
+                                    <input type="password" id="modalLRInput15" class="form-control form-control-sm validate">
+                                    <label data-error="wrong" data-success="right" for="modalLRInput14">Repeat password</label>
+                                </div>
+
+                                <div class="text-center form-sm mt-2">
+                                    <button class="btn btn-info">Sign up <i class="fa fa-sign-in ml-1"></i></button>
+                                </div>
+
+                            </div>
+                            <!--Footer-->
+                            <div class="modal-footer">
+                                <div class="options text-right">
+                                    <p class="pt-1">Already have an account? <a href="#" class="blue-text">Log In</a></p>
+                                </div>
+                                <button type="button" class="btn btn-outline-info waves-effect ml-auto" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        <!--/.Panel 8-->
+                    </div>
+
+                </div>
+            </div>
+            <!--/.Content-->
         </div>
-      </li>
-    </ul>
-  </div>
-</nav>
+    </div>
 
 
-{% for flash in get_flashed_messages() %}
-    {{ flash }}
-{% endfor %}
+    <div>    <!-- button trigger: change to dropdown trigger -->
 
-{% block content %}
+        <div class="modal fade" id="modalContactForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header text-center">
+                        <h4 class="modal-title w-100 font-weight-bold">Add Custom Flag</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body mx-3">
+                        <div class="md-form mb-5">
+                            <label data-error="wrong" data-success="right" for="form34">Flag Name</label>
+                            <i class="fa fa-user prefix grey-text"></i>
+                            <input type="text" id="form34" class="form-control validate">
+                        </div>
 
-BODY CONTENT GOES HERE
+                        <div class="md-form">
+                            <label data-error="wrong" data-success="right" for="form8">Ingredients</label>
+                            <i class="fa fa-pencil prefix grey-text"></i>
+                            <textarea type="text" id="form8" class="md-textarea form-control" rows="4"></textarea>
+                            <label data-error="wrong" data-success="right" for="form8">* separate with commas</label>
+                        </div>
 
-{% endblock %}
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <button class="btn btn-unique">Save<i class="fa fa-paper-plane-o ml-1"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endblock %}
+    
+    </div>
+
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+
+        function alertSignOut(response) {
+            $("#navbar_log_in_out_btn").html("Sign In");
+            alert(response);
+        }
+
+        function signOut() {
+            $.ajax({
+                url: '/logout.json',
+                success: alertSignOut,
+            });
+        }
+
+        function logInModalShow(evt) {
+            if ($("#navbar_log_in_out_btn").text() == "Sign In") {
+                $("#modalLRForm").modal("show");
+            } else {
+                $(signOut);
+            };
+        };
+
+        $("#navbar_log_in_out_btn").on("click", logInModalShow)
+
+    </script>
+
+    <script>
+
+        function logInBtn(response) {
+            if (response == "No") {
+                $("#navbar_log_in_out_btn").html("Sign In");
+            } else {
+                $("#navbar_log_in_out_btn").html("Sign Out");
+            };
+        };
+        
+        function askServer() {
+            $.ajax({
+                url: '/user_validation.json', 
+                success: logInBtn,
+            });
+        };
+
+    </script>
+
+    <script>
+
+        function confirmLogIn(response) {
+            if (response == "No") {
+                alert("Your email and/or password does not exist in our system, please register or try again");
+            } else {
+                $("#navbar_log_in_out_btn").html("Sign Out");
+                alert("Welcome back " + response + ".");
+            };
+        };
+        
+        function processLogIn() {
+            $.ajax({
+                url: '/user_login.json', 
+                method: "POST", 
+                data: { email: $("#modalLRInput10").val(), password: $("#modalLRInput11").val()},
+                success: confirmLogIn, 
+            });
+        };
+
+        $("#login_btn").on("click", processLogIn);
+
+    </script>
+
+    <script>
+
+        function submitFlag(evt) {
+            evt.preventDefault();
+
+            let formInputs = {
+                "user_flag_name": $("#user_flag_name").val(), 
+                "user_flag_ings": $("#user_ingredients_for_flagging").val(),
+            };
+
+            $.post('/user_flag_add.json', 
+                   formInputs, 
+                   askFuzz);
+        }
+
+        $('#user_flag_form').on('submit', submitFlag);
+ 
+    </script>
 
 
 

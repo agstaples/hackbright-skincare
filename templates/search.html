@@ -7,7 +7,7 @@
     <div class="result_3">    :D    </div>
     <div class="result_4">    :D    </div>
 
-    <img src="https://goo.gl/images/3xHfeo">
+
 
 
     <script>
@@ -17,14 +17,14 @@
             let prods_string = "";
             let brands_string = "";
             let cats_string = "";
-            let ings_string = ""
-            let flags_string = ""
-            let prod_ing_string = ""
+            let ings_string = "";
+            let flags_string = "";
+            let prod_ing_string = "";
             let products = response["products"];
             let brands = response["brands"];
-            let categories = response["categories"]
-            let ingredients = response["ingredients"]
-            let rankings = response["rank"]
+            let categories = response["categories"];
+            let ingredients = response["ingredients"];
+            let rankings = response["rank"];
 
             for (let product of products) {
                 prods_string = prods_string + product.pr_name + " / " + product.brand + " : <br><img src=" + product.image_url + "><br>";
@@ -84,7 +84,6 @@
             } else if (rankings[3] == "ingredient") {
                 $('.result_4').html(ings_string);
             };
-            debugger;
         }
 
         function submitSearch(evt) {
@@ -102,5 +101,6 @@
         $('#search_form').on('submit', submitSearch);
  
     </script>
+
 
 {% endblock %}

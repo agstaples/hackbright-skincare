@@ -39,15 +39,6 @@ class Product(db.Model):
                                        backref=db.backref("products",
                                                      order_by=product_id))
 
-    def get_flags(self):
-        """returns flags associated with product"""
-
-        response_flags = []
-        for ingredient in self.prod_ingredients:
-            for flag in ingredient.ing_flags:
-                response_flags.append(flag)
-        response_flags = list(set(response_flags))
-        return response_flags
 
     def __repr__(self):
         """For easier id when printing"""
@@ -178,6 +169,16 @@ class Ingredient_Flag(db.Model):
 
 ###### SCHEMAS ######
 
+class UserSchema(Schema):
+    """Flag table schema"""
+
+    user_id = fields.Int(dump_only=True)
+    fname = fields.Str()
+    email = fields.Str()
+    password = fields.Str()
+
+users_schema = UserSchema()
+
 
 class FlagSchema(Schema):
     """Flag table schema"""
@@ -215,6 +216,19 @@ class ProductSchema(Schema):
     category = fields.Str()
     image_url = fields.Str()
     prod_ingredients = fields.Nested(IngredientSchema, many=True)
+    flags = fields.Method("get_flags")
+
+    # method for returning flags:
+    def get_flags(self, obj):
+        """returns flags associated with product"""
+
+        response_flags = []
+        for ingredient in obj.prod_ingredients:
+            for flag in ingredient.ing_flags:
+                response_flags.append(flag.name)
+        response_flags = list(set(response_flags))
+        return response_flags
+
 
 products_schema = ProductSchema(many=True)
 
@@ -230,6 +244,7 @@ def connect_to_db(app):
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
     db.init_app(app)
+
 
 
 if __name__ == "__main__":
