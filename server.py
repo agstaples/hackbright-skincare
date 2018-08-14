@@ -7,7 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, products_schema, ingredients_schema, flags_schema, users_schema
 
-from search import search_by_term
+from search import search_by_term, return_close_ing_matches
 
 
 app = Flask(__name__)
@@ -90,7 +90,6 @@ def logout():
 
     # deleting user from session when they log out
     del session["user_id"]
-    print("deleted")
 
     return "You have successfully signed out"
 
@@ -137,7 +136,9 @@ def return_flag_close_ings():
     """Returns search results as json to render on /search page"""
 
     user_flag_name = request.form.get("user_flag_name")
-    user_flag_ings_input = request.form.get("user_flag_ings")
+    session["user_flag_info"] = ("", [])
+    user_id = session["user_id"]
+    user_flag_ings_input = str(request.form.get("user_flag_ings"))
     user_flag_ings_list = user_flag_ings_input.split(",")
     user_flag_ings = []
     for user_flag_ing in user_flag_ings_list:
@@ -147,27 +148,49 @@ def return_flag_close_ings():
     user_flag_response = return_close_ing_matches(user_flag_ings)
     # returns: (auto_add_ing, confirm_add_ing)
 
-    # alert close matches under 99 and over 90 (100 and 99 included automatically)
-    if user_flag_response:
-        auto_add_ing_serialized = ingredients_schema.dump(search_response[0])
-        print(auto_add_ing_serialized)
-        confirm_add_ing_serialized = ingredients_schema.dump(search_response[1])
+    auto_add_ing = user_flag_response[0]
+    confirm_add_ing = user_flag_response[1]
 
-        return_response = jsonify(confirm_add_ing=confirm_add_ing_serialized, 
-                                  auto_add_ing=auto_add_ing_serialized)
-        return return_response
+    # if matches 99 or 100 matches, and no close matches create flag in database:
+    if auto_add_ings != [] and confirm_add_ing == []:
+        user_flag = Flag(name=user_flag_name, 
+            ingredients_list=auto_add_ings, 
+            user_id=user_id)
+
+        # commiting new user flag to database
+        db.session.add(user_flag)
+        db.session.commit()
+
+    # if close matches: add to session and send back to user:
+    if confirm_add_ing != []:    
+        session["user_flag_info"] = (user_flag_name, auto_add_ing)
 
 
-    return None
+    # return matches between 85 & 99 for confirmation otherwise return []
+    return jsonify(auto_add_ing=auto_add_ing, 
+                   confirm_add_ing=confirm_add_ing, 
+                   user_flag_name=user_flag_name)
 
 
-@app.route("/user_flag_add.json", methods=["POST"])
-def add_user_flag():
+@app.route("/user_flag_fuzz_ing_add.json", methods=["POST"])
+def add_user_fuzz_ings():
     """creates custom user flag in database"""
 
+    add_fuzz_ings = request.form.get("chechedIngs")
+    flag_name = session["user_flag_info"][0]
+    session_flag_ings = session["user_flag_info"][1]
+    # concatinating original match list and user approved fuzzy matches:
+    flag_ings = session_flag_ings + add_fuzz_ings
+    user_id = session["user_id"]
 
 
+    user_flag = Flag(name=flag_name, 
+                ingredients_list=flag_ings, 
+                user_id=user_id)
 
+    # commiting new user flag to database
+    db.session.add(user_flag)
+    db.session.commit()
 
 
 if __name__ == "__main__":

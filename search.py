@@ -101,19 +101,15 @@ def return_close_ing_matches(user_flag_ings):
 
     # get match scores
     for ing in user_flag_ings:
-        ingredient_matches = process.extract(ing, ingredient_choices, scorer=fuzz.ratio, limit = 15)
+        ingredient_matches = process.extract(ing, ingredient_choices, scorer=fuzz.partial_ratio, limit=10000)
         for fuzz_ing in ingredient_matches:
             if fuzz_ing[1] >= 99:
-                auto_add_ing.append(fuzz_ing)
-            elif fuzz_ing[1] >= 90:
-                confirm_add_ing.append(fuzz_ing)
+                auto_add_ing.append(fuzz_ing[0])
+            elif fuzz_ing[1] >= 85:
+                confirm_add_ing.append(fuzz_ing[0])
 
     # if there are objects in either list, return those matches, else return None to prompt error message
-    if len(auto_add_ing) > 0 or len(confirm_add_ing) > 0:
-        return (auto_add_ing, confirm_add_ing)
-
-    else:
-        return None
+    return (auto_add_ing, confirm_add_ing)
 
 
 

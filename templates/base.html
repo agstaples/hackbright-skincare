@@ -35,10 +35,10 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Flags</a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Create Custom Flag</a>
-                            <a class="dropdown-item" href="#">Edit Custom Flag</a>
+                            <a class="dropdown-item" id="create_flag" href="#">Create Custom Flag</a>
+                            <a class="dropdown-item" id="edit_flag" href="#">Edit Custom Flag</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Disable/Enable Flag</a>
+                        <a class="dropdown-item" id="disable_enable_flag" href="#">Disable/Enable Flag</a>
                         </div>
                     </li>
                 </ul>
@@ -152,19 +152,18 @@
         </div>
     </div>
 
-
+<!-- flag add modal -->
     <div>    <!-- button trigger: change to dropdown trigger -->
-
         <div class="modal fade" id="modalContactForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
-                <div class="modal-content">
+                <div class="modal-content" id="modal_flag_content">
                     <div class="modal-header text-center">
                         <h4 class="modal-title w-100 font-weight-bold">Add Custom Flag</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body mx-3">
+                    <form class="modal-body mx-3" id="user_flag_form">
                         <div class="md-form mb-5">
                             <label data-error="wrong" data-success="right" for="form34">Flag Name</label>
                             <i class="fa fa-user prefix grey-text"></i>
@@ -174,14 +173,38 @@
                         <div class="md-form">
                             <label data-error="wrong" data-success="right" for="form8">Ingredients</label>
                             <i class="fa fa-pencil prefix grey-text"></i>
-                            <textarea type="text" id="form8" class="md-textarea form-control" rows="4"></textarea>
+                            <input type="text" id="form8" class="md-textarea form-control" rows="4">
                             <label data-error="wrong" data-success="right" for="form8">* separate with commas</label>
                         </div>
+                        <div class="modal-footer d-flex justify-content-center">
+                            <button type="submit" class="btn btn-unique" id="user_flag_form_submit_btn">Save<i class="fa fa-paper-plane-o ml-1"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
+<!-- ing fuzz modal -->
+    <div>    <!-- button trigger: change to dropdown trigger -->
+        <div class="modal fade" id="ingFuzzForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content" id="modal_ing_fuzz_content">
+                    <div class="modal-header text-center">
+                        <h4 class="modal-title w-100 font-weight-bold" id="fuzz_ing_header">Add Closely Related Ingredients</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                    <div class="modal-footer d-flex justify-content-center">
-                        <button class="btn btn-unique">Save<i class="fa fa-paper-plane-o ml-1"></i></button>
-                    </div>
+                    <form class="modal-body mx-3" id="flag_ing_fuzz_form">
+                        <div class="checkbox" id="flag_ing_fuzz_checkboxes"> 
+                            <label>
+                              <input class="check_list" id="checkbox_list" name="check_list[]" type="checkbox">
+                            </label>
+                        </div>
+                        <div class="modal-footer d-flex justify-content-center">
+                            <button type="submit" class="btn btn-unique" id="flag_ing_form_submit_btn">Add to Flag<i class="fa fa-paper-plane-o ml-1"></i></button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -265,23 +288,77 @@
 
     <script>
 
-        function submitFlag(evt) {
+        function getAddIngs(evt) {
+            console.log(evt);
+            let checkedIngs = [];
+            $("#flag_ing_fuzz_checkboxes input:checked").each(function() {
+                checkedIngs.push(this.value);
+            });
+            $.post('/user_flag_fuzz_ing_add.json', 
+                   checkedIngs);
+        };
+
+        $("#flag_ing_fuzz_form").on("submit", getAddIngs);
+
+    </script>
+
+    <script>
+
+        function showIngModal(response) {
+
+            let html_string = "";
+            let auto_add_ing = response["auto_add_ing"];
+            let confirm_add_ing = response["confirm_add_ing"];
+            if (auto_add_ing.length == 0 && confirm_add_ing.length == 0) {
+                alert("There were no close matches, please try again.");
+            } else if (auto_add_ing.length != 0 && confirm_add_ing.length != 0) {
+                for (let ing of confirm_add_ing) {
+                    console.log(ing);
+                    html_string = html_string + "<input type='checkbox' value='" + ing + "' ><label for='" + ing + "' >" + ing + "</label><br><br>";
+                };
+                $("#flag_ing_fuzz_checkboxes").html(html_string);
+                $("#ingFuzzForm").modal({show:true});
+            } else if (auto_add_ing.length != 0 && confirm_add_ing.length == 0) {
+                $("#modalContactForm").modal("hide");
+                alert("Your flag has been added");
+            } else if (auto_add_ing.length == 0 && confirm_add_ing.length != 0) {
+                for (let ing of confirm_add_ing) {
+                    html_string = html_string + "<input type='checkbox' value='" + ing + "' ><label for='" + ing + "' >" + ing + "</label><br><br>";
+                };
+                $("#fuzz_ing_header").text("No exact matches, please chose from the below or search again");
+                $("#flag_ing_fuzz_checkboxes").html(html_string);
+                $("#ingFuzzForm").modal({show:true});
+            };
+
+        };
+
+
+        function ingFuzzCheck(evt) {
             evt.preventDefault();
 
             let formInputs = {
-                "user_flag_name": $("#user_flag_name").val(), 
-                "user_flag_ings": $("#user_ingredients_for_flagging").val(),
+                "user_flag_name": $("#form34").val(), 
+                "user_flag_ings": $("#form8").val(),
             };
 
-            $.post('/user_flag_add.json', 
+            $.post('/user_flag_ing_check.json', 
                    formInputs, 
-                   askFuzz);
+                   showIngModal);
         }
 
-        $('#user_flag_form').on('submit', submitFlag);
+        $('#user_flag_form').on('submit', ingFuzzCheck);
  
     </script>
 
+    <script>
+
+        function showFlagModal(evt) {
+            $("#modalContactForm").modal("show");
+        };
+
+        $("#create_flag").on("click", showFlagModal)
+ 
+    </script>
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
