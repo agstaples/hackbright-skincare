@@ -117,6 +117,29 @@ class User(db.Model):
         return f"<User name={self.fname}>"
 
 
+class User_Flag(db.Model):
+    """Canadian ingredient flags and notes"""
+
+    __tablename__ = "user_flags"
+
+    user_flag_id = db.Column(db.Integer, 
+                           autoincrement=True, 
+                           primary_key=True)
+    enabled = db.Column(db.Boolean, 
+                        unique=False, 
+                        default=True)
+    user_id = db.Column(db.Integer, 
+                        db.ForeignKey("users.user_id"))
+    flag_id = db.Column(db.Integer, 
+                        db.ForeignKey("flags.flag_id"))
+
+
+    def __repr__(self):
+        """For easier id when printing"""
+
+        return f"<User Flag user flag={self.user_flag_id}>"
+
+
 
 class Flag(db.Model):
     """Canadian ingredient flags and notes"""
@@ -129,9 +152,7 @@ class Flag(db.Model):
     name = db.Column(db.String(150))
     description = db.Column(db.String(400))
     ingredients_list = db.Column(db.String(500000))
-    user_id = db.Column(db.Integer, 
-                        db.ForeignKey("users.user_id"), 
-                        nullable=True)
+
 
 
     fl_ingredients = db.relationship("Ingredient",

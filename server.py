@@ -5,7 +5,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, Ingredient_Flag, products_schema, ingredients_schema, flags_schema, users_schema
+from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, User_Flag, Ingredient_Flag, products_schema, ingredients_schema, flags_schema, users_schema
 
 from search import search_by_term, return_close_ing_matches
 
@@ -33,30 +33,45 @@ def check_for_user():
     return "No"
 
 
-@app.route("/register", methods=["POST"])
+@app.route("/user_register.json", methods=["POST"])
 def process_registration():
     """Loads new user data to database"""
 
-    fname = request.form["fname"]
-    email = request.form["email"]
-    password = request.form["password"]
+    print("in route")
+
+    fname = request.form.get("fname")
+    email = request.form.get("email")
+    password_1 = request.form.get("password_1")
+    password_2 = request.form.get("password_2")
 
     # checking if user already exists in database
     if User.query.filter_by(email=email).first():
-        flash("That email address already exists in our files, please login.")
-        return redirect("/login")
+        return redirect("Not unique")
     # creating new user
+    elif password_1 != password_2:
+        return "No"
+
     else:
         user = User(fname=fname, 
                     email=email, 
-                    password=password)
+                    password=password_1)
 
-    # commiting new user to database
-    db.session.add(user)
-    db.session.commit()
+        db.session.add(user)
+        db.session.flush()
 
-    flash("You successfully registered. Let's get searching.")
-    return redirect("/search")
+        user_id = user.user_id
+        db.session.commit()
+        session["user_id"] = user_id
+        user_flag_1 = User_Flag(user_id=user_id, 
+                                flag_id=1)
+        db.session.add(user_flag_1)
+        user_flag_2 = User_Flag(user_id=user_id, 
+                                flag_id=2)
+        db.session.add(user_flag_2)
+        db.session.commit()
+        return "Yes"
+
+    return "No"
 
 
 @app.route("/user_login.json", methods=["POST"])
@@ -148,27 +163,28 @@ def return_flag_close_ings():
     user_flag_response = return_close_ing_matches(user_flag_ings)
     # returns: (auto_add_ing, confirm_add_ing)
 
-    auto_add_ing = user_flag_response[0]
-    confirm_add_ing = user_flag_response[1]
+    auto_add_ings = user_flag_response[0]
+    confirm_add_ings = user_flag_response[1]
 
-    # if matches 99 or 100 matches, and no close matches create flag in database:
-    if auto_add_ings != [] and confirm_add_ing == []:
-        user_flag = Flag(name=user_flag_name, 
-            ingredients_list=auto_add_ings, 
-            user_id=user_id)
+    session["user_flag_info"] = (user_flag_name, auto_add_ings)
+    if len(confirm_add_ings) < 1 and len(auto_add_ings) > 0:
+        flag = Flag(name=user_flag_name, 
+                    ingredients_list=auto_add_ings)
+        db.session.add(flag)
+        db.session.flush()
 
-        # commiting new user flag to database
+        flag_id = flag.flag_id
+        user_flag = User_Flag(flag_id=flag_id, 
+                              user_id=user_id)
         db.session.add(user_flag)
         db.session.commit()
 
-    # if close matches: add to session and send back to user:
-    if confirm_add_ing != []:    
-        session["user_flag_info"] = (user_flag_name, auto_add_ing)
-
+        load_ingredient_flags()
+    print("wtf")
 
     # return matches between 85 & 99 for confirmation otherwise return []
-    return jsonify(auto_add_ing=auto_add_ing, 
-                   confirm_add_ing=confirm_add_ing, 
+    return jsonify(auto_add_ing=auto_add_ings, 
+                   confirm_add_ing=confirm_add_ings, 
                    user_flag_name=user_flag_name)
 
 
@@ -176,21 +192,102 @@ def return_flag_close_ings():
 def add_user_fuzz_ings():
     """creates custom user flag in database"""
 
-    add_fuzz_ings = request.form.get("chechedIngs")
+    # add_fuzz_ings = request.get("chechedIngs")
+    # add_fuzz_ings = request.POST["chechedIngs"]
+    add_fuzz_ings = request.form.getlist("ings[]")
     flag_name = session["user_flag_info"][0]
-    session_flag_ings = session["user_flag_info"][1]
-    # concatinating original match list and user approved fuzzy matches:
-    flag_ings = session_flag_ings + add_fuzz_ings
+    auto_add_ings = session["user_flag_info"][1]
+    flag_ings = []
+    for flag in add_fuzz_ings:
+        flag_ings.append(flag)
+    for flag in auto_add_ings:
+        flag_ings.append(flag)
     user_id = session["user_id"]
 
+    flag = Flag(name=flag_name, 
+                ingredients_list=flag_ings)
+    db.session.add(flag)
+    db.session.flush()
 
-    user_flag = Flag(name=flag_name, 
-                ingredients_list=flag_ings, 
-                user_id=user_id)
-
-    # commiting new user flag to database
+    flag_id = flag.flag_id
+    user_flag = User_Flag(flag_id=flag_id, 
+                          user_id=user_id)
     db.session.add(user_flag)
     db.session.commit()
+
+    load_ingredient_flags()
+
+    return "SUCCESS!!!"
+
+
+def create_flag_ingredient_dictionary():
+    """creates dictionary of flag ingredients to populate flag_ingredient table"""
+
+    user_id = session["user_id"]
+
+    fl_ing_dict = {}
+
+    user_flags = User_Flag.query.filter(User_Flag.user_id == user_id).all()
+
+    for user_flag in user_flags:
+        flag_id = user_flag.flag_id
+        # adding flag_id keys to dictionary
+        fl_ing_dict[flag_id] = []
+        flag = Flag.query.filter(Flag.flag_id == flag_id).first()
+        # getting list of ingredients for each flag
+        ingredients_all = flag.ingredients_list.strip("'\"{'}").split(",")
+        for ingredient_single in ingredients_all:
+            ingredient_single = str(ingredient_single.strip("'\"{'}"))
+            # cleaning up individual ingredientt and adding as values to dictionary
+            fl_ing_dict[flag_id].append(ingredient_single)
+
+    return fl_ing_dict
+
+
+def load_ingredient_flags():
+    """Loads ingredient/flag data"""
+
+
+    fl_ing_dict = create_flag_ingredient_dictionary()
+
+    # getting full list of unique ingredients
+    ingredients = Ingredient.query.all()
+
+    for ingredient in ingredients:
+        ingredient_name = ingredient.ing_name
+        ingredient_id = ingredient.ingredient_id
+        # matching ingredient to product_id
+        for key, value in fl_ing_dict.items():
+            if ingredient_name in value:
+                # creating product/ingredient instance
+                ingredient_flag = Ingredient_Flag(flag_id=key, 
+                                                  ingredient_id=ingredient_id)
+                db.session.add(ingredient_flag)
+
+    db.session.commit()
+
+    return "Success"
+
+
+@app.route("/flag_info.json", methods=["POST"])
+def disable_enable_flag():
+    """Decativates and/or activates exisiting flags"""
+
+    user_id = session["user_id"]
+    # not correct, need to pull from user_Flag table:
+    user_flags = User_Flag.query.filter(User_Flag.user_id == user_id).all()
+    enabled_flags = []
+    disabled_flags = []
+    for flag in user_flags:
+        response_flag = Flag.query.filter(Flag.flag_id == flag.flag_id).first()
+        if flag.enabled:
+            enabled_flags.append(response_flag.name)
+        else:
+            disabled_flags.append(response_flag.name)
+
+    return jsonify(enabled_flags=enabled_flags, 
+                   disabled_flags=disabled_flags)
+
 
 
 if __name__ == "__main__":

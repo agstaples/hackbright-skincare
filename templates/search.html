@@ -27,7 +27,7 @@
             let rankings = response["rank"];
 
             for (let product of products) {
-                prods_string = prods_string + product.pr_name + " / " + product.brand + " : <br><img src=" + product.image_url + "><br>";
+                prods_string = prods_string + product.pr_name + " / " + product.flags + " / " + product.brand + " : <br><img src=" + product.image_url + "><br>";
             };
             
             for (let brand of brands) {

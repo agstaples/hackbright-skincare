@@ -199,6 +199,8 @@ def load_ingredient_flags():
 
     db.session.commit()
 
+    return "Success"
+
 
 def load_categories(doc):
     """Loads product category data"""
@@ -247,9 +249,9 @@ if __name__ == "__main__":
     # once ingredients cleaned up, run this to update flags:
     # fuzz_flag_ingredients(ingredients_list)
 
-    # load_products("seed_data/valid_skin_urls.txt")
-    # load_ingredients()
-    # load_product_ingredients()
+    load_products("test_seed_data/test_valid_skin_urls.txt")
+    load_ingredients()
+    load_product_ingredients()
     # load_flags("test_seed_data/test_flags.txt")
     # load_ingredient_flags()
 

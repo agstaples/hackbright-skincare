@@ -131,7 +131,7 @@
                                 </div>
 
                                 <div class="text-center form-sm mt-2">
-                                    <button class="btn btn-info">Sign up <i class="fa fa-sign-in ml-1"></i></button>
+                                    <button class="btn btn-info" id="register_btn">Sign up <i class="fa fa-sign-in ml-1"></i></button>
                                 </div>
 
                             </div>
@@ -185,7 +185,7 @@
         </div>
 
 <!-- ing fuzz modal -->
-    <div>    <!-- button trigger: change to dropdown trigger -->
+    <div> 
         <div class="modal fade" id="ingFuzzForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content" id="modal_ing_fuzz_content">
@@ -203,6 +203,31 @@
                         </div>
                         <div class="modal-footer d-flex justify-content-center">
                             <button type="submit" class="btn btn-unique" id="flag_ing_form_submit_btn">Add to Flag<i class="fa fa-paper-plane-o ml-1"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+<!-- enable/disable modal -->
+    <div> 
+        <div class="modal fade" id="flagDisableEnableModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content" id="modal_enable_disable_content">
+                    <div class="modal-header text-center">
+                        <h4 class="modal-title w-100 font-weight-bold" id="enable_disable_header">Available Flags</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form class="modal-body mx-3" id="flagDisableEnableForm">
+                        <div class="checkbox" id="disable_enable_checkboxes"> 
+                            <label>
+                              <input class="check_list" id="enable_disable_checkbox_list" name="check_list[]" type="checkbox">
+                            </label>
+                        </div>
+                        <div class="modal-footer d-flex justify-content-center">
+                            <button type="submit" class="btn btn-unique" id="flag_enable_disable_form_submit_btn">Update<i class="fa fa-paper-plane-o ml-1"></i></button>
                         </div>
                     </form>
                 </div>
@@ -232,6 +257,7 @@
         }
 
         function logInModalShow(evt) {
+            evt.preventDefault();
             if ($("#navbar_log_in_out_btn").text() == "Sign In") {
                 $("#modalLRForm").modal("show");
             } else {
@@ -277,7 +303,8 @@
             $.ajax({
                 url: '/user_login.json', 
                 method: "POST", 
-                data: { email: $("#modalLRInput10").val(), password: $("#modalLRInput11").val()},
+                data: { email: $("#modalLRInput10").val(), 
+                        password: $("#modalLRInput11").val()},
                 success: confirmLogIn, 
             });
         };
@@ -288,14 +315,47 @@
 
     <script>
 
+        function confirmRegister(response) {
+            if (response == "Yes") {
+                alert("You are registered");
+                $("#navbar_log_in_out_btn").html("Sign Out");
+                $("#modalLRForm").modal("hide");
+            } else if (response == "Not unique") {
+                alert("That email already exists in our system, please log in.");
+            } else {
+                alert("Something went wrong, please try again");
+            };
+        };
+        
+        function processRegister() {
+            $.ajax({
+                url: '/user_register.json', 
+                method: "POST", 
+                data: { fname: $("#modalLRInput12").val(), 
+                        email: $("#modalLRInput13").val(), 
+                        password_1: $("#modalLRInput14").val(), 
+                        password_2: $("#modalLRInput15").val()},
+                success: confirmRegister,
+            });
+        };
+
+        $("#register_btn").on("click", processRegister);
+
+    </script>
+
+    <script>
+
         function getAddIngs(evt) {
-            console.log(evt);
+            evt.preventDefault();
             let checkedIngs = [];
             $("#flag_ing_fuzz_checkboxes input:checked").each(function() {
                 checkedIngs.push(this.value);
             });
             $.post('/user_flag_fuzz_ing_add.json', 
-                   checkedIngs);
+                   {ings: checkedIngs}, 
+                   null, 
+                   "json").then($("#ingFuzzForm").modal("hide"));
+            $("#modalContactForm").modal("hide");
         };
 
         $("#flag_ing_fuzz_form").on("submit", getAddIngs);
@@ -353,10 +413,43 @@
     <script>
 
         function showFlagModal(evt) {
+            evt.preventDefault();
             $("#modalContactForm").modal("show");
         };
 
         $("#create_flag").on("click", showFlagModal)
+ 
+    </script>
+
+
+    <script>
+
+        function showFlagEnableDisableModal(response) {
+
+            let html_string = "";
+            let enabled_flags = response["enabled_flags"];
+            let disabled_flags = response["disabled_flags"];
+            for (let flag of enabled_flags) {
+                html_string = html_string + "<input type='checkbox' value='" + flag + "'class='enabled' ><label for='" + flag + "' >" + flag + "</label><br><br>";
+            };
+            for (let flag of disabled_flags) {
+                html_string = html_string + "<input type='checkbox' value='" + flag + "'class='disabled' ><label for='" + flag + "' >" + flag + "</label><br><br>";
+            };
+            $("#disable_enable_checkboxes").html(html_string);
+            $('.enabled').prop('checked', true);
+            $('.disabled').prop('checked', false);
+
+            $("#flagDisableEnableModal").modal("show");
+        };
+
+        function getFlags(evt) {
+            evt.preventDefault();
+
+            $.post('/flag_info.json', 
+                   showFlagEnableDisableModal);
+        };
+
+        $("#disable_enable_flag").on("click", getFlags);
  
     </script>
 
