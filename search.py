@@ -80,6 +80,7 @@ def search_by_term(user_query):
 
     # if there are objects in products list, return info for rendering, else return None to prompt error message
     if len(products) > 0:
+        print((products, brands, categories, (match_1, match_2, match_3, match_4), ingredients, ingredient_names))
         return (products, brands, categories, (match_1, match_2, match_3, match_4), ingredients, ingredient_names)
 
     else:

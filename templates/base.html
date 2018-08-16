@@ -11,6 +11,8 @@
 
     <link href="/static/project.css" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+
 </head>
 <body onload="askServer()">
     {% block navbar %}
@@ -45,7 +47,6 @@
             </div>
         </nav>
     </div>
-
 
 <!-- login/registration popup -->
     <div class="modal fade" id="modalLRForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -106,7 +107,7 @@
                         <div class="tab-pane fade" id="panel8" role="tabpanel">
 
                             <!--Body-->
-                            <div class="modal-body">
+                            <div class="modal-body" id="register-body">
                                 <div class="md-form form-sm mb-5">
                                     <i class="fa fa-envelope prefix"></i>
                                     <input type="text" id="modalLRInput12" class="form-control form-control-sm validate">Your First Name</label>
@@ -154,7 +155,7 @@
 
 <!-- flag add modal -->
     <div>    <!-- button trigger: change to dropdown trigger -->
-        <div class="modal fade" id="modalContactForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal fade" id="addFlagForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content" id="modal_flag_content">
                     <div class="modal-header text-center">
@@ -296,6 +297,10 @@
             } else {
                 $("#navbar_log_in_out_btn").html("Sign Out");
                 alert("Welcome back " + response + ".");
+                $("#modalLRForm").modal("hide");
+                $("#modalLRForm").on("hidden.bs.modal", function () {
+                    $(this).find("#login_form").trigger('reset');
+                });
             };
         };
         
@@ -320,6 +325,9 @@
                 alert("You are registered");
                 $("#navbar_log_in_out_btn").html("Sign Out");
                 $("#modalLRForm").modal("hide");
+                $("#modalLRForm").on("hidden.bs.modal", function () {
+                    $(this).find("#register-body").trigger('reset');
+                });
             } else if (response == "Not unique") {
                 alert("That email already exists in our system, please log in.");
             } else {
@@ -355,7 +363,13 @@
                    {ings: checkedIngs}, 
                    null, 
                    "json").then($("#ingFuzzForm").modal("hide"));
-            $("#modalContactForm").modal("hide");
+            $("#addFlagForm").modal("hide");
+            $("#addFlagForm").on("hidden.bs.modal", function () {
+                $(this).find('form').trigger('reset');
+            });
+            $("#ingFuzzForm").on("hidden.bs.modal", function () {
+                $(this).find('form').trigger('reset');
+            });
         };
 
         $("#flag_ing_fuzz_form").on("submit", getAddIngs);
@@ -379,7 +393,10 @@
                 $("#flag_ing_fuzz_checkboxes").html(html_string);
                 $("#ingFuzzForm").modal({show:true});
             } else if (auto_add_ing.length != 0 && confirm_add_ing.length == 0) {
-                $("#modalContactForm").modal("hide");
+                $("#addFlagForm").modal("hide");
+                $("#addFlagForm").on("hidden.bs.modal", function () {
+                    $(this).find('form').trigger('reset');
+                });
                 alert("Your flag has been added");
             } else if (auto_add_ing.length == 0 && confirm_add_ing.length != 0) {
                 for (let ing of confirm_add_ing) {
@@ -414,13 +431,38 @@
 
         function showFlagModal(evt) {
             evt.preventDefault();
-            $("#modalContactForm").modal("show");
+            $("#addFlagForm").modal("show");
         };
 
         $("#create_flag").on("click", showFlagModal)
  
     </script>
 
+    <script>
+
+        function getEnableDisableFlags(evt) {
+            evt.preventDefault();
+            let checkedFlags = [];
+            let uncheckedFlags = [];
+            $("#disable_enable_checkboxes input:checked").each(function() {
+                checkedFlags.push(this.value);
+            });
+            $("#disable_enable_checkboxes input:checkbox:not(:checked)").each(function() {
+                uncheckedFlags.push(this.value);
+            });
+            $.post('/user_flag_status_update.json', 
+                   {checkedFlags: checkedFlags, 
+                    uncheckedFlags: uncheckedFlags}, 
+                   null, 
+                   "json").then($("#flagDisableEnableModal").modal("hide"));
+            $("#flagDisableEnableModal").on("hidden.bs.modal", function () {
+                $(this).find('form').trigger('reset');
+            });
+        };
+
+        $("#flagDisableEnableForm").on("submit", getEnableDisableFlags);
+
+    </script>
 
     <script>
 

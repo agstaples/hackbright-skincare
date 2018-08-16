@@ -192,8 +192,6 @@ def return_flag_close_ings():
 def add_user_fuzz_ings():
     """creates custom user flag in database"""
 
-    # add_fuzz_ings = request.get("chechedIngs")
-    # add_fuzz_ings = request.POST["chechedIngs"]
     add_fuzz_ings = request.form.getlist("ings[]")
     flag_name = session["user_flag_info"][0]
     auto_add_ings = session["user_flag_info"][1]
@@ -269,8 +267,33 @@ def load_ingredient_flags():
     return "Success"
 
 
+@app.route("/user_flag_status_update.json", methods=["POST"])
+def update_user_flag_status():
+    """creates custom user flag in database"""
+
+    checked_flags = request.form.getlist("checkedFlags[]")
+    unchecked_flags = request.form.getlist("uncheckedFlags[]")
+    user_id = session["user_id"]
+
+    for flag in checked_flags:
+        flag = Flag.query.filter_by(name=flag).first()
+        user_flag = User_Flag.query.filter((User_Flag.flag_id==flag.flag_id) & (User_Flag.user_id==user_id)).first()
+        setattr(user_flag, "enabled", True)
+
+    for flag in unchecked_flags:
+        flag = Flag.query.filter_by(name=flag).first()
+        user_flag = User_Flag.query.filter((User_Flag.flag_id==flag.flag_id) & (User_Flag.user_id==user_id)).first()
+        setattr(user_flag, "enabled", False)
+
+    print(user_flag)
+
+    db.session.commit()
+
+    return "SUCCESS!!!"
+
+
 @app.route("/flag_info.json", methods=["POST"])
-def disable_enable_flag():
+def get_user_flag_status():
     """Decativates and/or activates exisiting flags"""
 
     user_id = session["user_id"]
