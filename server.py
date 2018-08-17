@@ -8,6 +8,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, User, Flag, User_Flag, Ingredient_Flag, products_schema, ingredients_schema, flags_schema, users_schema
 
 from search import search_by_term, return_close_ing_matches
+from fuzzywuzzy import process, fuzz
 
 
 app = Flask(__name__)
@@ -36,8 +37,6 @@ def check_for_user():
 @app.route("/user_register.json", methods=["POST"])
 def process_registration():
     """Loads new user data to database"""
-
-    print("in route")
 
     fname = request.form.get("fname")
     email = request.form.get("email")
@@ -180,7 +179,6 @@ def return_flag_close_ings():
         db.session.commit()
 
         load_ingredient_flags()
-    print("wtf")
 
     # return matches between 85 & 99 for confirmation otherwise return []
     return jsonify(auto_add_ing=auto_add_ings, 
@@ -275,17 +273,17 @@ def update_user_flag_status():
     unchecked_flags = request.form.getlist("uncheckedFlags[]")
     user_id = session["user_id"]
 
-    for flag in checked_flags:
-        flag = Flag.query.filter_by(name=flag).first()
-        user_flag = User_Flag.query.filter((User_Flag.flag_id==flag.flag_id) & (User_Flag.user_id==user_id)).first()
-        setattr(user_flag, "enabled", True)
+    if len(checked_flags) > 0:
+        for flag in checked_flags:
+            flag = Flag.query.filter_by(name=flag).first()
+            user_flag = User_Flag.query.filter((User_Flag.flag_id==flag.flag_id) & (User_Flag.user_id==user_id)).first()
+            setattr(user_flag, "enabled", True)
 
-    for flag in unchecked_flags:
-        flag = Flag.query.filter_by(name=flag).first()
-        user_flag = User_Flag.query.filter((User_Flag.flag_id==flag.flag_id) & (User_Flag.user_id==user_id)).first()
-        setattr(user_flag, "enabled", False)
-
-    print(user_flag)
+    if len(unchecked_flags) > 0:
+        for flag in unchecked_flags:
+            flag = Flag.query.filter_by(name=flag).first()
+            user_flag = User_Flag.query.filter((User_Flag.flag_id==flag.flag_id) & (User_Flag.user_id==user_id)).first()
+            setattr(user_flag, "enabled", False)
 
     db.session.commit()
 
@@ -297,7 +295,6 @@ def get_user_flag_status():
     """Decativates and/or activates exisiting flags"""
 
     user_id = session["user_id"]
-    # not correct, need to pull from user_Flag table:
     user_flags = User_Flag.query.filter(User_Flag.user_id == user_id).all()
     enabled_flags = []
     disabled_flags = []
@@ -311,6 +308,51 @@ def get_user_flag_status():
     return jsonify(enabled_flags=enabled_flags, 
                    disabled_flags=disabled_flags)
 
+
+@app.route("/return_products.json", methods=["POST"])
+def get_products():
+    """Decativates and/or activates exisiting flags"""
+
+    user_input_tuple = request.form.get("user_input")
+    user_input = user_input_tuple[0]
+    user_input_type = user_input_tuple[1]
+
+    if user_input_type == "Category":
+        return_prods = Product.query.filter(Product.category == user_input).limit(24)
+
+    elif user_input_type == "Brand":
+        return_prods = Product.query.filter(Product.brand == user_input).limit(24)
+
+    elif user_input_type == "Ingredient":
+        ingredient = Ingredient.query.filter(Ingredient.ing_name == user_input).first()
+        return_prods = ingredient.ing_products
+
+    prods_serialized_response = products_schema.dump(return_prods)
+    return jsonify(products=prods_serialized_response)
+
+@app.route("/return_products_prod.json", methods=["POST"])
+def show_more_products():
+    """Decativates and/or activates exisiting flags"""
+
+    prod_one = request.form.get("prod_one")
+
+    products_all = Product.query
+
+    product_choices = []
+
+    for product in products_all:
+        product_choices.append(product.pr_name)
+
+    product_matches = process.extract(prod_one, product_choices, scorer=fuzz.partial_ratio, limit = 50) 
+
+    products = []
+    for product in product_matches:
+        prod = products_all.filter(Product.pr_name == product[0]).first()
+        if prod not in products:
+                products.append(prod)
+
+    prods_serialized_response = products_schema.dump(products)
+    return jsonify(products=prods_serialized_response)
 
 
 if __name__ == "__main__":
