@@ -8,6 +8,7 @@ from model import connect_to_db, db, Product, Product_Ingredient, Ingredient, Us
 from server import app
 import os
 from fuzzywuzzy import process, fuzz
+import time
 # from sephora_scrape import scrape_relevant_product_info
 
 def load_products(doc="seed_data/valid_skin_urls.txt"):
@@ -28,48 +29,52 @@ def load_products(doc="seed_data/valid_skin_urls.txt"):
             page = urlopen(request)
             # creating BeautifulSoup object for parsing
             soup = BeautifulSoup(page, "html.parser")
+            time.sleep(2)
             # getting product name
-            name_object = soup.find(attrs={"class": "css-1g2jq23"})
+            name_object = soup.find(attrs={"class": "css-at8tjb"})
             if name_object:
                 name = name_object.string
                 print(name)
                 # getting category information
-                category = soup.find(attrs={"class": "css-j60h5s"}).string
-                if category != "Skincare":
-                    # getting product brand
-                    brand = soup.find(attrs={"class": "css-cjz2sh"}).string
-                    # getting star rating as percentage
-                    stars_object = soup.find(attrs={"class": "css-dtomnp"})
-                    stars = str(stars_object["style"].strip("%").split(":")[-1])
-                    # getting price from sephora page
-                    price_string = soup.find(attrs={"class": "css-18suhml"}).string
-                    if price_string == None:
-                        price = str(0)
-                    else:
-                        price = str(price_string.strip("$"))
-                    # product box contains all product information inculding ingredients
-                    product_box = soup.find_all(attrs={'class': 'css-1juot2r'})
-                    ingredients_all = product_box[-1].text
-                    ingredients_list = ingredients_all.split("\n")
-                    if len(ingredients_list[-1]) < 1:
-                        ingredients = ingredients_list[-2].rstrip(".")
-                    else:
-                        ingredients = ingredients_list[-1].rstrip(".")
-                    images = soup.select('div.css-t6rz1k > svg > image')
-                    for image in images:
-                        image_url = f"https://www.sephora.com{image.get('xlink:href')}"
-                    # creating product instance
-                    product = Product(sephora_url=url, 
-                              pr_name=name, 
-                              brand=brand, 
-                              stars=float(stars), 
-                              price=float(price),
-                              category=category,  
-                              image_url=image_url, 
-                              ingredients_list=ingredients)
-                    db.session.add(product)
+                # category = soup.select('div.css-1k9l7o4 > h1')
+                # category = soup.find(attrs={"class": "css-c02gs2"}).string
+                category_box = soup.find_all(attrs={'class': 'css-vgfijk'})
+                print(category_box)
+                if len(category_box) > 0:
+                    category = str(category_box[-1])
                 else:
+                    category = ""
                     print("***NO CATEGORY***")
+                # getting product brand
+                brand = soup.find(attrs={"class": "css-1lujsz0"}).string
+               # getting price from sephora page
+                price_string = soup.find(attrs={"class": "css-n8yjg7"}).string
+                if price_string == None:
+                    price = str(0)
+                else:
+                    price = str(price_string.strip("$"))
+                # product box contains all product information inculding ingredients
+                print(price)
+                product_box = soup.find_all(attrs={'class': 'css-1vwy1pm'})
+                ingredients_all = product_box[-1].text
+                ingredients_list = ingredients_all.split("\n")
+                if len(ingredients_list[-1]) < 1:
+                    ingredients = ingredients_list[-2].rstrip(".")
+                else:
+                    ingredients = ingredients_list[-1].rstrip(".")
+                images = soup.select('div.css-1lnrgf6 > svg > image')
+                for image in images:
+                    image_url = f"https://www.sephora.com{image.get('xlink:href')}"
+                print(image_url)
+                # creating product instance
+                product = Product(sephora_url=url, 
+                          pr_name=name, 
+                          brand=brand,  
+                          price=float(price),
+                          category=category,  
+                          image_url=image_url, 
+                          ingredients_list=ingredients)
+                db.session.add(product)
             else:
                 print("***ERROR***")
                 print(url)

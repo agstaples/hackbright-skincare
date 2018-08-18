@@ -1,6 +1,7 @@
 """Models and database functions"""
 
 from flask_sqlalchemy import SQLAlchemy
+from flask import session
 from marshmallow import Schema, fields
 
 
@@ -21,11 +22,9 @@ class Product(db.Model):
     brand = db.Column(db.String(1000), 
                       nullable=True)
     sephora_url = db.Column(db.String(1000))
-    stars = db.Column(db.Integer, 
-                      nullable=True)
     price = db.Column(db.Integer, 
                       nullable=True)
-    category = db.Column(db.String(150), 
+    category = db.Column(db.String(1500), 
                            nullable=True)
     image_url = db.Column(db.String(1000),
                           nullable=True)
@@ -133,6 +132,8 @@ class User_Flag(db.Model):
     flag_id = db.Column(db.Integer, 
                         db.ForeignKey("flags.flag_id"))
 
+    flag_users = db.relationship("User", backref="users")
+    users_flags = db.relationship("Flag", backref="flags")
 
     def __repr__(self):
         """For easier id when printing"""
@@ -152,8 +153,6 @@ class Flag(db.Model):
     name = db.Column(db.String(150))
     description = db.Column(db.String(400))
     ingredients_list = db.Column(db.String(500000))
-
-
 
     fl_ingredients = db.relationship("Ingredient",
                                   secondary="join(Ingredient_Flag, Ingredient, Ingredient_Flag.ingredient_id == Ingredient.ingredient_id)", 
@@ -232,12 +231,12 @@ class ProductSchema(Schema):
     pr_name = fields.Str()
     brand = fields.Str()
     sephora_url = fields.Str()
-    stars = fields.Int()
     price = fields.Int()
     category = fields.Str()
     image_url = fields.Str()
     prod_ingredients = fields.Nested(IngredientSchema, many=True)
     flags = fields.Method("get_flags")
+    enabled_flags = fields.Method("get_enabled_flags")
 
     # method for returning flags:
     def get_flags(self, obj):
@@ -247,6 +246,21 @@ class ProductSchema(Schema):
         for ingredient in obj.prod_ingredients:
             for flag in ingredient.ing_flags:
                 response_flags.append(flag.name)
+        response_flags = list(set(response_flags))
+        return response_flags
+
+    # method for returning user flags:
+    def get_enabled_flags(self, obj):
+        """returns flags associated with product and specific user"""
+
+        user_id = session["user_id"]
+        response_flags = []
+        for ingredient in obj.prod_ingredients:
+            for flag in ingredient.ing_flags:
+                user_flag = User_Flag.query.filter((User_Flag.flag_id==flag.flag_id) & (User_Flag.user_id==user_id)).first()
+                if user_flag != None:
+                  if user_flag.enabled == True:
+                      response_flags.append(user_flag.users_flags.name)
         response_flags = list(set(response_flags))
         return response_flags
 

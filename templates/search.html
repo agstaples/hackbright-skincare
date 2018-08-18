@@ -52,12 +52,12 @@
 
             for (let product of products.slice(0, 3)) {
                 prods_card_string += 
-                    `<div class="card" id="${product.pr_name}">
+                    `<div class="card product_card" id="${product.pr_name}">
                         <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
                         <div class="card-body">
                             <h5 class="card-title">${product.pr_name}</h5>
                             <p class="card-text">${product.brand}</p>
-                            <p class="card-text"><small class="text-muted">${product.flags}</small></p>
+                            <p class="card-text"><small class="text-muted">${product.enabled_flags}</small></p>
                         </div>
                     </div>`;
                 prods_string = `<h1 class="display-4" id="product_header">Products</h1><div class="card-deck" id="card_deck_prods">${prods_card_string}</div>`;
@@ -66,7 +66,7 @@
             for (let brand of brands.slice(0, 3)) {
                 brand_no_space = brand.replace(/\s+/g, '');
                 brands_card_string += 
-                    `<div class="card" id="${brand}">
+                    `<div class="card brand_card" id="${brand}">
                         <img class="card-img-top" src="//logo.clearbit.com/${brand_no_space}.com" alt="Card image cap">
                         <div class="card-body">
                             <h5 class="card-title">${brand}</h5>
@@ -79,7 +79,7 @@
 
             for (let category of categories.slice(0, 3)) {
                 cats_card_string += 
-                    `<div class="card" id="${category}">
+                    `<div class="card cat_card" id="${category}">
                         <img class="card-img-top" src="" alt="Card image cap">
                         <div class="card-body">
                             <h5 class="card-title">${category}</h5>
@@ -95,7 +95,7 @@
                     ingredient["ing_flags"] = flag["name"];
                 };
                 ings_card_string += 
-                    `<div class="card" id="${ingredient["ing_name"]}">
+                    `<div class="card ing_card" id="${ingredient["ing_name"]}">
                         <img class="card-img-top" src="" alt="Card image cap">
                         <div class="card-body">
                             <h5 class="card-title">${ingredient["ing_name"]}</h5>
@@ -181,31 +181,79 @@
                         <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
                         <div class="card-body">
                             <h5 class="card-title">${product.pr_name}</h5>
-                            <p class="card-text">${product.flags}</p>
+                            <p class="card-text">${product.enabled_flags}</p>
                         </div>
                         <div class="card-footer">
                             <small class="text-muted">${product.brand}</small>
                         </div>
                     </div>`;
             };
-
             $("#jumbotron_1").attr("hidden", true);
             $("#jumbotron_2").attr("hidden", true);
             $("#jumbotron_3").attr("hidden", true);
             $("#jumbotron_4").attr("hidden", true);
-            debugger;
             $("#prod_cards").html(prods_card_string);
-            debugger;
+        };
+
+        function submitCat(evt) {
+            evt.preventDefault();
+
+            let id = "";
+            let type = "Category";
+            id = $(this).attr("id");
+
+            let inputs = {
+                "id": id,
+                "type": type,
+            };
+
+            $.post('/return_products.json', 
+                   inputs, 
+                   renderFullPageProds);
+        };
+        
+        function submitBrand(evt) {
+            evt.preventDefault();
+
+            let id = "";
+            let type = "Brand";
+            id = $(this).attr("id");
+
+            let inputs = {
+                "id": id,
+                "type": type,
+            };
+
+            $.post('/return_products.json', 
+                   inputs, 
+                   renderFullPageProds);
+        };
+
+        function submitIng(evt) {
+            evt.preventDefault();
+
+            let id = "";
+            let type = "Ingredient";
+            id = $(this).attr("id");
+
+            let inputs = {
+                "id": id,
+                "type": type,
+            };
+
+            $.post('/return_products.json', 
+                   inputs, 
+                   renderFullPageProds); 
         };
 
         function submitProdOne(evt) {
             evt.preventDefault();
 
-            let ids = ""
-            ids = $("#card_deck_prods").children(".card").attr("id");
+            let id = "";
+            id = $("#card_deck_prods").children(".card").attr("id");
 
             let inputs = {
-                "prod_one": ids,
+                "prod_one": id,
             };
 
             $.post('/return_products_prod.json', 
@@ -214,6 +262,10 @@
         };
 
         $(".jumbotron").on("click", "#product_header", submitProdOne);
+        $(".jumbotron").on("click", ".cat_card", submitCat);
+        $(".jumbotron").on("click", ".brand_card", submitBrand);
+        $(".jumbotron").on("click", ".ing_card", submitIng);
+
 
     </script>
 

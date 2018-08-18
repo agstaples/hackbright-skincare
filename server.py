@@ -147,7 +147,7 @@ def return_search_results():
 
 @app.route("/user_flag_ing_check.json", methods=["POST"])
 def return_flag_close_ings():
-    """Returns search results as json to render on /search page"""
+    """Returns close ingredient matches for user approval"""
 
     user_flag_name = request.form.get("user_flag_name")
     session["user_flag_info"] = ("", [])
@@ -264,7 +264,6 @@ def load_ingredient_flags():
 
     return "Success"
 
-
 @app.route("/user_flag_status_update.json", methods=["POST"])
 def update_user_flag_status():
     """creates custom user flag in database"""
@@ -313,22 +312,22 @@ def get_user_flag_status():
 def get_products():
     """Decativates and/or activates exisiting flags"""
 
-    user_input_tuple = request.form.get("user_input")
-    user_input = user_input_tuple[0]
-    user_input_type = user_input_tuple[1]
+    user_input_name = request.form.get("id")
+    user_input_type = request.form.get("type")
 
     if user_input_type == "Category":
-        return_prods = Product.query.filter(Product.category == user_input).limit(24)
+        return_prods = Product.query.filter(Product.category == user_input_name).limit(24)
 
     elif user_input_type == "Brand":
-        return_prods = Product.query.filter(Product.brand == user_input).limit(24)
+        return_prods = Product.query.filter(Product.brand == user_input_name).limit(24)
 
     elif user_input_type == "Ingredient":
-        ingredient = Ingredient.query.filter(Ingredient.ing_name == user_input).first()
+        ingredient = Ingredient.query.filter(Ingredient.ing_name == user_input_name).first()
         return_prods = ingredient.ing_products
 
     prods_serialized_response = products_schema.dump(return_prods)
     return jsonify(products=prods_serialized_response)
+
 
 @app.route("/return_products_prod.json", methods=["POST"])
 def show_more_products():
@@ -353,6 +352,7 @@ def show_more_products():
 
     prods_serialized_response = products_schema.dump(products)
     return jsonify(products=prods_serialized_response)
+
 
 
 if __name__ == "__main__":
