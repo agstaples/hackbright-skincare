@@ -101,7 +101,11 @@ def return_close_ing_matches(user_flag_ings):
 
     # get match scores
     for ing in user_flag_ings:
-        ingredient_matches = process.extract(ing, ingredient_choices, scorer=fuzz.partial_ratio, limit=10000)
+        split_ing = ing.split()
+        if len(split_ing) > 1:
+            ingredient_matches = process.extract(ing, ingredient_choices, scorer=fuzz.ratio)
+        else:
+            ingredient_matches = process.extract(ing, ingredient_choices, scorer=fuzz.partial_ratio)
         for fuzz_ing in ingredient_matches:
             if fuzz_ing[1] >= 99:
                 auto_add_ing.append(fuzz_ing[0])

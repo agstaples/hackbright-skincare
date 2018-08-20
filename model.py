@@ -235,23 +235,12 @@ class ProductSchema(Schema):
     category = fields.Str()
     image_url = fields.Str()
     prod_ingredients = fields.Nested(IngredientSchema, many=True)
-    flags = fields.Method("get_flags")
     enabled_flags = fields.Method("get_enabled_flags")
+    enabled_flag_ings = fields.Method("get_enabled_flag_ings")
 
     # method for returning flags:
-    def get_flags(self, obj):
-        """returns flags associated with product"""
-
-        response_flags = []
-        for ingredient in obj.prod_ingredients:
-            for flag in ingredient.ing_flags:
-                response_flags.append(flag.name)
-        response_flags = list(set(response_flags))
-        return response_flags
-
-    # method for returning user flags:
     def get_enabled_flags(self, obj):
-        """returns flags associated with product and specific user"""
+        """returns flags associated with product"""
 
         user_id = session["user_id"]
         response_flags = []
@@ -259,10 +248,27 @@ class ProductSchema(Schema):
             for flag in ingredient.ing_flags:
                 user_flag = User_Flag.query.filter((User_Flag.flag_id==flag.flag_id) & (User_Flag.user_id==user_id)).first()
                 if user_flag != None:
-                  if user_flag.enabled == True:
-                      response_flags.append(user_flag.users_flags.name)
+                    if user_flag.enabled == True:
+                        response_flags.append(user_flag.users_flags.name)
         response_flags = list(set(response_flags))
         return response_flags
+
+    # method for returning user flags and associated ings:
+    def get_enabled_flag_ings(self, obj):
+        """returns flags associated with product and specific user and flagged ings"""
+
+        user_id = session["user_id"]
+        response_flags_ings = {}
+        for ingredient in obj.prod_ingredients:
+            for flag in ingredient.ing_flags:
+                user_flag = User_Flag.query.filter((User_Flag.flag_id==flag.flag_id) & (User_Flag.user_id==user_id)).first()
+                if user_flag != None:
+                    if user_flag.enabled == True:
+                        if user_flag.users_flags.name in response_flags_ings:
+                            response_flags_ings[user_flag.users_flags.name] += f", {ingredient.ing_name}"
+                        else:
+                            response_flags_ings[user_flag.users_flags.name] = f"{ingredient.ing_name}"
+        return response_flags_ings
 
 
 products_schema = ProductSchema(many=True)

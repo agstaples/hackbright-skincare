@@ -15,72 +15,80 @@ def load_products(doc="seed_data/valid_skin_urls.txt"):
     """Loads product data from Sephora scrape"""
 
     counter = 0
+    fail_counter = 0
+    failed_urls = []
 
     # getting already vetted urls from file
     with open(doc) as valid_skin_urls:
         urls = valid_skin_urls.readlines()
         for url in urls:
-            counter += 1
             url = str(url.rstrip())
             # providing headers for client, otherwise request fails
             print(url)
             header = {"User-Agent":"Firefox"}
             request = Request(url, headers=header)
             page = urlopen(request)
+            time.sleep(5)
             # creating BeautifulSoup object for parsing
             soup = BeautifulSoup(page, "html.parser")
-            time.sleep(2)
             # getting product name
             name_object = soup.find(attrs={"class": "css-at8tjb"})
             if name_object:
                 name = name_object.string
-                print(name)
                 # getting category information
                 # category = soup.select('div.css-1k9l7o4 > h1')
                 # category = soup.find(attrs={"class": "css-c02gs2"}).string
-                category_box = soup.find_all(attrs={'class': 'css-vgfijk'})
-                print(category_box)
-                if len(category_box) > 0:
-                    category = str(category_box[-1])
+                categories = soup.find_all(attrs={'class': 'css-1euk4ns'})
+                if len(categories) > 0:
+                    category = categories[-1].text
+                    if category != "Skincare":
+                        print("in")
+                        # getting product brand
+                        brand = soup.find(attrs={"class": "css-1lujsz0"}).string
+                       # getting price from sephora page
+                        price_string = soup.find(attrs={"class": "css-n8yjg7"}).string
+                        if price_string == None:
+                            price = str(0)
+                        else:
+                            price = str(price_string.strip("$"))
+                        # product box contains all product information inculding ingredients
+                        product_box = soup.find_all(attrs={'class': 'css-1vwy1pm'})
+                        ingredients_all = product_box[-1].text
+                        ingredients_list = ingredients_all.split("\n")
+                        if len(ingredients_list[-1]) < 1:
+                            ingredients = ingredients_list[-2].rstrip(".")
+                        else:
+                            ingredients = ingredients_list[-1].rstrip(".")
+                        images = soup.select('div.css-1lnrgf6 > svg > image')
+                        for image in images:
+                            image_url = f"https://www.sephora.com{image.get('xlink:href')}"
+                        # creating product instance
+                        product = Product(sephora_url=url, 
+                                  pr_name=name, 
+                                  brand=brand,  
+                                  price=float(price),
+                                  category=category,  
+                                  image_url=image_url, 
+                                  ingredients_list=ingredients)
+                        db.session.add(product)
+                        db.session.commit()
+                        print(counter)
+                        counter += 1
+                    else:
+                        fail_counter += 1
+                        failed_urls.append(url)
                 else:
-                    category = ""
-                    print("***NO CATEGORY***")
-                # getting product brand
-                brand = soup.find(attrs={"class": "css-1lujsz0"}).string
-               # getting price from sephora page
-                price_string = soup.find(attrs={"class": "css-n8yjg7"}).string
-                if price_string == None:
-                    price = str(0)
-                else:
-                    price = str(price_string.strip("$"))
-                # product box contains all product information inculding ingredients
-                print(price)
-                product_box = soup.find_all(attrs={'class': 'css-1vwy1pm'})
-                ingredients_all = product_box[-1].text
-                ingredients_list = ingredients_all.split("\n")
-                if len(ingredients_list[-1]) < 1:
-                    ingredients = ingredients_list[-2].rstrip(".")
-                else:
-                    ingredients = ingredients_list[-1].rstrip(".")
-                images = soup.select('div.css-1lnrgf6 > svg > image')
-                for image in images:
-                    image_url = f"https://www.sephora.com{image.get('xlink:href')}"
-                print(image_url)
-                # creating product instance
-                product = Product(sephora_url=url, 
-                          pr_name=name, 
-                          brand=brand,  
-                          price=float(price),
-                          category=category,  
-                          image_url=image_url, 
-                          ingredients_list=ingredients)
-                db.session.add(product)
+                    fail_counter += 1
+                    failed_urls.append(url)
             else:
-                print("***ERROR***")
-                print(url)
-
+                fail_counter += 1
+                failed_urls.append(url)
+    
+    print(f"succeeded: {counter}")
+    print(f"failed: {fail_counter}")
+    print(failed_urls)
     print("****Donezo!****")
-    db.session.commit()
+    return
 
 
 def create_product_ingredient_dictionary():
@@ -254,11 +262,11 @@ if __name__ == "__main__":
     # once ingredients cleaned up, run this to update flags:
     # fuzz_flag_ingredients(ingredients_list)
 
-    load_products("test_seed_data/test_valid_skin_urls.txt")
+    # load_products("seed_data/valid_skin_urls.txt")
     load_ingredients()
     load_product_ingredients()
-    # load_flags("test_seed_data/test_flags.txt")
-    # load_ingredient_flags()
+    load_flags("test_seed_data/test_flags.txt")
+    load_ingredient_flags()
 
 
 
