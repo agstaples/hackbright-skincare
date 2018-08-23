@@ -11,17 +11,18 @@
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
 
-    <link href="https://fonts.googleapis.com/css?family=Abel|Abril+Fatface|Amaranth|Fjalla+One|Libre+Franklin|M+PLUS+1p|Montserrat|Montserrat+Alternates:600|Nanum+Gothic|Open+Sans+Condensed:300|PT+Sans|Poiret+One|Poppins|Quattrocento+Sans|Questrial|Quicksand|Rajdhani:600|Source+Sans+Pro|Tajawal" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Raleway|Montserrat+Alternates:600" rel="stylesheet">
 
     <link rel="stylesheet" type="text/css" href="static/main.css">
-
+    <link rel="shortcut icon" href="static/favicon.ico" />
 </head>
 <body onload="askServer()">
+    <div id="full-bg"></div>
     {% block navbar %}
     <div id="navbar" style="display:none">
         <nav class="navbar navbar-expand-md transparent" id="nav_main">
-            <a class="navbar-brand" href="#" style="font-family: 'Montserrat Alternates'; font-size:40px; font-weight:bold; padding-top:10px">Gadget</a>
-            <img id="logo_btn" src="https://turismosemcensura.com.br/wp-content/uploads/2017/08/mist%C3%A9rio.jpg" width="55px" height="70px" style="margin-left:0px"/>
+            <a class="navbar-brand" href="#" style="font-family: 'Montserrat Alternates'; color:#9793a9; font-size:40px; font-weight:bold; padding-top:10px">Gadget</a>
+            <img id="logo_btn" src="static/gadget.png" width="55px" height="70px" style="margin-left:-20px"/>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -242,11 +243,15 @@
     </div>
 
     <div class="box" id="search_landing_box">
-        <div>
-        <a style="font-family: 'Montserrat Alternates'; font-size:40px; font-weight:bold; padding-top:20px">Gadget</a><img id="logo_img_search" src="https://turismosemcensura.com.br/wp-content/uploads/2017/08/mist%C3%A9rio.jpg" width="55px" height="70px" style="margin-left:0px"/></div>
-            <form action="/search_results.json" method="POST" id="search_form_landing">
-            <input type="search" id="user_search_landing" placeholder="Search" />
-            </form>
+        <div id="landing_search_logo_box">
+            <div>
+                <form action="/search_results.json" method="POST" id="search_form_landing">
+                <a class="landing_logo" id="landing_logo_text" style="font-family: 'Montserrat Alternates'; font-size:48px; font-weight:bold; padding-top: 200px;">Gadget</a>
+                <input class="landing_logo" id="landing_logo_image" type="image" name="submit" src="static/gadget.png" border="0" alt="Submit" id="logo_img_search" width="60px" height="80px" style="margin-left:-8px" /><br>
+                <input type="text" name="search" id="user_search_landing" placeholder="Search" />
+                </form>
+            </div>
+        </div>
     </div>
 
     <div id="content">
