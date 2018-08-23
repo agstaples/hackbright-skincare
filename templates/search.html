@@ -1,17 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
-
-    <div>
-        <img style="-webkit-user-select: none;cursor: zoom-in;" src="https://turismosemcensura.com.br/wp-content/uploads/2017/08/mist%C3%A9rio.jpg" width="50" height="80">
-    </div>
-
-    <form>
-        <input type="submit" value="Highlight Flagged" id="test_background_btn">
-    </form>
-
-
-    <div class="row mt-5 ml-5 mr-5 mb-5">
+    <div class="row mt-5 ml-5 mr-5 mb-5 prod_deck_1" style="display:none">
         <div class="col m4">
             <div class="prod_cards">
                 <div class="card-deck" id="prod_cards_1">
@@ -19,7 +9,7 @@
             </div>
         </div>
     </div>
-    <div class="row mt-5 ml-5 mr-5 mb-5">
+    <div class="row mt-5 ml-5 mr-5 mb-5 prod_deck_2" style="display:none">
         <div class="col m4">
             <div class="prod_cards">
                 <div class="card-deck" id="prod_cards_2">
@@ -27,7 +17,7 @@
             </div>
         </div>
     </div>
-    <div class="row mt-5 ml-5 mr-5 mb-5">
+    <div class="row mt-5 ml-5 mr-5 mb-5 prod_deck_3" style="display:none">
         <div class="col m4">
             <div class="prod_cards">
                 <div class="card-deck" id="prod_cards_3">
@@ -35,7 +25,7 @@
             </div>
         </div>
     </div>
-    <div class="row mt-5 ml-5 mr-5 mb-5">
+    <div class="row mt-5 ml-5 mr-5 mb-5 prod_deck_4" style="display:none">
         <div class="col m4">
             <div class="prod_cards">
                 <div class="card-deck" id="prod_cards_4">
@@ -43,7 +33,7 @@
             </div>
         </div>
     </div>
-    <div class="row mt-5 ml-5 mr-5 mb-5">
+    <div class="row mt-5 ml-5 mr-5 mb-5 prod_deck_5" style="display:none">
         <div class="col m4">
             <div class="prod_cards">
                 <div class="card-deck" id="prod_cards_5">
@@ -51,26 +41,18 @@
             </div>
         </div>
     </div>
-<!--     <div class="row mt-5 ml-5 mr-5 mb-5">
-        <div class="col m4">
-            <div class="prod_cards">
-                <div class="card-deck" id="prod_cards_6">
-                </div>
-            </div>
-        </div>
-    </div> -->
 
 
-    <div class="jumbotron" id="jumbotron_1" hidden="true">
+    <div class="jumbotron" id="jumbotron_1" style="display:none">
     </div>
 
-    <div class="jumbotron" id="jumbotron_2" hidden="true">
+    <div class="jumbotron" id="jumbotron_2" style="display:none">
     </div>
 
-    <div class="jumbotron" id="jumbotron_3" hidden="true">
+    <div class="jumbotron" id="jumbotron_3" style="display:none">
     </div>
 
-    <div class="jumbotron" id="jumbotron_4" hidden="true">
+    <div class="jumbotron" id="jumbotron_4" style="display:none">
     </div>
 
     <script>
@@ -85,32 +67,19 @@
             };
         };
 
-        $("#test_background_btn").on("click", backgroundRed);
-
-    </script>
-
-    <script>
-
-        function revealHidden(evt) {
+        function backgroundTransparent(evt) {
             evt.preventDefault();
 
-            $(".reveal bg-warning p-2").style()
-
-        }
-
-        function submitSearch(evt) {
-            evt.preventDefault();
-
-            let formInputs = {
-                "user_search": $("#user_search").val(),
+            if ($(".flagged").css("background-color") === "rgba(0, 0, 0, 0.1)") {
+                $(".flagged").css("background-color", "rgb(255, 255, 255)");
+                $(".flagged_img").show();
+            } else {
+                $(".flagged_img").hide();
+                $(".flagged").css("background-color", "rgba(0, 0, 0, 0.1)");
             };
+        };
 
-            $.post('/search_results.json', 
-                   formInputs, 
-                   renderCards);
-        }
-
-        $('.reveal bg-warning p-2').on('hover', revealHidden);
+        $("#logo_btn").on("click", backgroundTransparent);
 
     </script>
 
@@ -143,9 +112,9 @@
                 if (flagged_ings_string != "") {
                     prods_card_string += 
                         `<div class="card flagged" id="${product.pr_name}">
-                            <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
+                            <img class="card-img-top flagged_img" style="display:none" src="${product.image_url}" alt="Card image cap">
                             <div class="card-body">
-                                <h5 class="card-title">${product.brand}: ${product.pr_name}</h5>
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
                                 <p class="card-text">${flagged_ings_string}</p>
                             </div>
                             <a href="${product.sephora_url}">
@@ -190,7 +159,6 @@
             for (let category of categories.slice(0, 4)) {
                 cats_card_string += 
                     `<div class="card cat_card" id="${category}">
-                        <img class="card-img-top" src="" alt="Card image cap">
                         <div class="card-body">
                             <h5 class="card-title">${category}</h5>
                         </div>
@@ -207,7 +175,6 @@
                 };
                 ings_card_string += 
                     `<div class="card ing_card" id="${ingredient["ing_name"]}">
-                        <img class="card-img-top" src="" alt="Card image cap">
                         <div class="card-body">
                             <h5 class="card-title">${ingredient["ing_name"]}</h5>
                             <p class="card-text"><small class="text-muted">${ingredient["ing_flags"]}</small></p>
@@ -260,10 +227,18 @@
                 $("#jumbotron_4").html(ings_string);
             };
 
-            $("#jumbotron_1").attr("hidden", false);
-            $("#jumbotron_2").attr("hidden", false);
-            $("#jumbotron_3").attr("hidden", false);
-            $("#jumbotron_4").attr("hidden", false);
+            $("#navbar").show();
+            $("#search_landing_box").hide();
+            $("#jumbotron_1").show();
+            $("#jumbotron_2").show();
+            $("#jumbotron_3").show();
+            $("#jumbotron_4").show();
+            $(".flagged_img").show();
+            $(".prod_deck_1").hide();
+            $(".prod_deck_2").hide();
+            $(".prod_deck_3").hide();
+            $(".prod_deck_4").hide();
+            $(".prod_deck_5").hide();
         }
 
         function submitSearch(evt) {
@@ -278,8 +253,23 @@
                    renderCards);
         }
 
+        function submitSearchLanding(evt) {
+            evt.preventDefault();
+
+            let formInputs = {
+                "user_search": $("#user_search_landing").val(),
+            };
+
+            $.post('/search_results.json', 
+                   formInputs, 
+                   renderCards);
+        }
+
+        $('#logo_img_search').on('click', submitSearchLanding);
         $('#search_form').on('submit', submitSearch);
  
+
+
     </script>
 
     <script>
@@ -302,9 +292,9 @@
                 if (flagged_ings_string != "") {
                     prods_card_string_1 += 
                         `<div class="card flagged" id="${product.pr_name}">
-                            <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
+                            <img class="card-img-top flagged_img" hidden="false" src="${product.image_url}" alt="Card image cap">
                             <div class="card-body">
-                                <h5 class="card-title">${product.brand}: ${product.pr_name}</h5>
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
                                 <p class="card-text">${flagged_ings_string}</p>
                             </div>
                             <a href="${product.sephora_url}">
@@ -318,7 +308,7 @@
                         `<div class="card" id="${product.pr_name}">
                             <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
                             <div class="card-body">
-                                <h5 class="card-title">${product.brand}: ${product.pr_name}</h5>
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
                                 <p class="card-text">${flagged_ings_string}</p>
                             </div>
                             <a href="${product.sephora_url}">
@@ -337,9 +327,9 @@
                 if (flagged_ings_string != "") {
                     prods_card_string_2 += 
                         `<div class="card flagged" id="${product.pr_name}">
-                            <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
+                            <img class="card-img-top flagged_img" hidden="false" src="${product.image_url}" alt="Card image cap">
                             <div class="card-body">
-                                <h5 class="card-title">${product.brand}: ${product.pr_name}</h5>
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
                                 <p class="card-text">${flagged_ings_string}</p>
                             </div>
                             <a href="${product.sephora_url}">
@@ -353,7 +343,7 @@
                         `<div class="card" id="${product.pr_name}">
                             <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
                             <div class="card-body">
-                                <h5 class="card-title">${product.brand}: ${product.pr_name}</h5>
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
                                 <p class="card-text">${flagged_ings_string}</p>
                             </div>
                             <a href="${product.sephora_url}">
@@ -372,9 +362,9 @@
                 if (flagged_ings_string != "") {
                     prods_card_string_3 += 
                         `<div class="card flagged" id="${product.pr_name}">
-                            <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
+                            <img class="card-img-top flagged_img" hidden="false" src="${product.image_url}" alt="Card image cap">
                             <div class="card-body">
-                                <h5 class="card-title">${product.brand}: ${product.pr_name}</h5>
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
                                 <p class="card-text">${flagged_ings_string}</p>
                             </div>
                             <a href="${product.sephora_url}">
@@ -388,7 +378,7 @@
                         `<div class="card" id="${product.pr_name}">
                             <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
                             <div class="card-body">
-                                <h5 class="card-title">${product.brand}: ${product.pr_name}</h5>
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
                                 <p class="card-text">${flagged_ings_string}</p>
                             </div>
                             <a href="${product.sephora_url}">
@@ -407,9 +397,9 @@
                 if (flagged_ings_string != "") {
                     prods_card_string_4 += 
                         `<div class="card flagged" id="${product.pr_name}">
-                            <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
+                            <img class="card-img-top flagged_img" hidden="false" src="${product.image_url}" alt="Card image cap">
                             <div class="card-body">
-                                <h5 class="card-title">${product.brand}: ${product.pr_name}</h5>
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
                                 <p class="card-text">${flagged_ings_string}</p>
                             </div>
                             <a href="${product.sephora_url}">
@@ -423,7 +413,7 @@
                         `<div class="card" id="${product.pr_name}">
                             <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
                             <div class="card-body">
-                                <h5 class="card-title">${product.brand}: ${product.pr_name}</h5>
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
                                 <p class="card-text">${flagged_ings_string}</p>
                             </div>
                             <a href="${product.sephora_url}">
@@ -442,9 +432,9 @@
                 if (flagged_ings_string != "") {
                     prods_card_string_5 += 
                         `<div class="card flagged" id="${product.pr_name}">
-                            <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
+                            <img class="card-img-top flagged_img" hidden="false" src="${product.image_url}" alt="Card image cap">
                             <div class="card-body">
-                                <h5 class="card-title">${product.brand}: ${product.pr_name}</h5>
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
                                 <p class="card-text">${flagged_ings_string}</p>
                             </div>
                             <a href="${product.sephora_url}">
@@ -458,7 +448,7 @@
                         `<div class="card" id="${product.pr_name}">
                             <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
                             <div class="card-body">
-                                <h5 class="card-title">${product.brand}: ${product.pr_name}</h5>
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
                                 <p class="card-text">${flagged_ings_string}</p>
                             </div>
                             <a href="${product.sephora_url}">
@@ -469,15 +459,21 @@
                         </div>`;
                 };
             };
-            $("#jumbotron_1").attr("hidden", true);
-            $("#jumbotron_2").attr("hidden", true);
-            $("#jumbotron_3").attr("hidden", true);
-            $("#jumbotron_4").attr("hidden", true);
+            $("#jumbotron_1").hide();
+            $("#jumbotron_2").hide();
+            $("#jumbotron_3").hide();
+            $("#jumbotron_4").hide();
+            $(".prod_deck_1").show();
+            $(".prod_deck_2").show();
+            $(".prod_deck_3").show();
+            $(".prod_deck_4").show();
+            $(".prod_deck_5").show();
             $("#prod_cards_1").html(prods_card_string_1);
             $("#prod_cards_2").html(prods_card_string_2);
             $("#prod_cards_3").html(prods_card_string_3);
             $("#prod_cards_4").html(prods_card_string_4);
             $("#prod_cards_5").html(prods_card_string_5);
+            $(".flagged_img").attr("hidden", false);
             // $("#prod_cards_6").html(prods_card_string_6);      
         };
 

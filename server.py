@@ -61,12 +61,12 @@ def process_registration():
         user_id = user.user_id
         db.session.commit()
         session["user_id"] = user_id
-        user_flag_1 = User_Flag(user_id=user_id, 
-                                flag_id=1)
-        db.session.add(user_flag_1)
-        user_flag_2 = User_Flag(user_id=user_id, 
-                                flag_id=2)
-        db.session.add(user_flag_2)
+        # user_flag_1 = User_Flag(user_id=user_id, 
+        #                         flag_id=1)
+        # db.session.add(user_flag_1)
+        # user_flag_2 = User_Flag(user_id=user_id, 
+        #                         flag_id=2)
+        # db.session.add(user_flag_2)
         db.session.commit()
         return "Yes"
 
