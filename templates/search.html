@@ -235,7 +235,11 @@
                 $("#jumbotron_4").html(ings_string);
             };
 
-            $("#navbar").show();
+
+            $(".navbar-toggler").attr("hidden", false);
+            $(".navbar-brand").attr("hidden", false);
+            $("#logo_btn").attr("hidden", false);
+            $(".navbar_search").show();
             $("#search_landing_box").hide();
             $("#jumbotron_1").show();
             $("#jumbotron_2").show();

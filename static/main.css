@@ -1,0 +1,97 @@
+
+
+* {
+    font-family: 'Raleway', sans-serif;
+}
+
+body {
+  background: url(white_top_sharon-mccutcheon-576863-unsplash.jpg) no-repeat center center;
+  background-size: cover;
+  background-position: 0px 0px;
+}
+
+
+#nav_main {
+  background-color: #FFFFFF; 
+  opacity: 0.5; 
+  filter: alpha(opacity=0);
+}
+
+.jumbotron {
+  background: rgba(255, 255, 255, 0.7);
+  width: 90%;
+  margin: auto;
+  margin-bottom: 35px;
+  padding-top: 22px;
+  padding-bottom: 35px;
+  margin-top: 35px;
+}
+
+.box {
+  text-align:center;
+  vertical-align: middle;
+  position:fixed;
+  width:100%;
+  height:100%;
+  top:115px;
+  left:0px;
+  z-index:1000;
+  color: #69103d;
+  text-shadow: 2px 2px 4px #FFFFFF;
+/*  e6e1dc
+  dac4c7*/
+/*  808080
+  FFFFFF*/
+/*  C0C0C0*/
+e7dad2*/
+}
+
+input[type=text] {
+    width: 250px;
+    -webkit-transition: width 0.4s ease-in-out;
+    transition: width 0.4s ease-in-out;
+}
+
+input[type=text]:focus {
+    width: 300px;
+}
+
+#landing_search_logo_box {
+    padding-top:180px;
+}
+
+.navbar_logo {
+    display: inline;
+}
+
+.card {
+    box-shadow: 0px 3px 8px -4px rgba(0,0,0,0.15);
+    overflow: hidden;
+}
+
+h1 {
+    font-family: 'Montserrat Alternates';
+    font-size:30px;
+}
+
+.flagged_card_header {
+    height: 42px;
+    overflow: scroll;
+}
+
+.btn-outline-success {
+    color: #fffff;
+    border-color: #fffff;
+}
+
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+    background-color: #FFFF00;
+    color: #FFC0CB;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+
+

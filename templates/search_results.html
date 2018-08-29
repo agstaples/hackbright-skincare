@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <form>
+        <input type="submit" id="test_background_btn">
+    </form>
+
+    <div class="row mt-5 ml-5 mr-5 mb-5">
+        <div class="col m4">
+            <div class="prod_cards">
+                <div class="card-deck" id="prod_cards_1">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-5 ml-5 mr-5 mb-5">
+        <div class="col m4">
+            <div class="prod_cards">
+                <div class="card-deck" id="prod_cards_2">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-5 ml-5 mr-5 mb-5">
+        <div class="col m4">
+            <div class="prod_cards">
+                <div class="card-deck" id="prod_cards_3">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-5 ml-5 mr-5 mb-5">
+        <div class="col m4">
+            <div class="prod_cards">
+                <div class="card-deck" id="prod_cards_4">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-5 ml-5 mr-5 mb-5">
+        <div class="col m4">
+            <div class="prod_cards">
+                <div class="card-deck" id="prod_cards_5">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        function backgroundTransparent(evt) {
+            evt.preventDefault();
+
+            if ($(".flagged").css("background-color") === "rgba(0, 0, 0, 0.1)") {
+                $(".flagged").css("background-color", "rgb(255, 255, 255)");
+                $(".flagged_img").attr("hidden", false);
+            } else {
+                $(".flagged_img").attr("hidden", true);
+                $(".flagged").css("background-color", "rgba(0, 0, 0, 0.1)");
+            };
+        };
+
+        $("#test_background_btn").on("click", backgroundTransparent);
+
+    </script>
+
+    <script>
+
+        function renderFullPageProds(response) {
+
+            let prods = response["products"];
+            let prods_card_string_1 = "";
+            let prods_card_string_2 = "";
+            let prods_card_string_3 = "";
+            let prods_card_string_4 = "";
+            let prods_card_string_5 = "";
+            let prods_card_string_6 = "";
+
+            for (let product of prods.slice(0, 5)) {
+                let flagged_ings_string = "";
+                for (let flag in product.enabled_flag_ings) {
+                    flagged_ings_string += `${flag}: ${product.enabled_flag_ings[flag]}`
+                };
+                if (flagged_ings_string != "") {
+                    prods_card_string_1 += 
+                        `<div class="card flagged" id="${product.pr_name}">
+                            <img class="card-img-top flagged_img" hidden="false" src="${product.image_url}" alt="Card image cap">
+                            <div class="card-body">
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
+                                <p class="card-text">${flagged_ings_string}</p>
+                            </div>
+                            <a href="${product.sephora_url}">
+                                <div class="card-footer">
+                                    <small class="text-muted">Buy from Sephora for $${product.price} ></small>
+                                </div>
+                            </a>
+                        </div>`;
+                } else {
+                    prods_card_string_1 += 
+                        `<div class="card" id="${product.pr_name}">
+                            <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
+                            <div class="card-body">
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
+                                <p class="card-text">${flagged_ings_string}</p>
+                            </div>
+                            <a href="${product.sephora_url}">
+                                <div class="card-footer">
+                                    <small class="text-muted">Buy from Sephora for $${product.price} ></small>
+                                </div>
+                            </a>
+                        </div>`;
+                };
+            };
+            for (let product of prods.slice(5, 10)) {
+                let flagged_ings_string = "";
+                for (let flag in product.enabled_flag_ings) {
+                    flagged_ings_string += `${flag}: ${product.enabled_flag_ings[flag]}`
+                };
+                if (flagged_ings_string != "") {
+                    prods_card_string_2 += 
+                        `<div class="card flagged" id="${product.pr_name}">
+                            <img class="card-img-top flagged_img" hidden="false" src="${product.image_url}" alt="Card image cap">
+                            <div class="card-body">
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
+                                <p class="card-text">${flagged_ings_string}</p>
+                            </div>
+                            <a href="${product.sephora_url}">
+                                <div class="card-footer">
+                                    <small class="text-muted">Buy from Sephora for $${product.price} ></small>
+                                </div>
+                            </a>
+                        </div>`;
+                } else {
+                    prods_card_string_2 += 
+                        `<div class="card" id="${product.pr_name}">
+                            <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
+                            <div class="card-body">
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
+                                <p class="card-text">${flagged_ings_string}</p>
+                            </div>
+                            <a href="${product.sephora_url}">
+                                <div class="card-footer">
+                                    <small class="text-muted">Buy from Sephora for $${product.price} ></small>
+                                </div>
+                            </a>
+                        </div>`;
+                };
+            };
+            for (let product of prods.slice(10, 15)) {
+                let flagged_ings_string = "";
+                for (let flag in product.enabled_flag_ings) {
+                    flagged_ings_string += `${flag}: ${product.enabled_flag_ings[flag]}`
+                };
+                if (flagged_ings_string != "") {
+                    prods_card_string_3 += 
+                        `<div class="card flagged" id="${product.pr_name}">
+                            <img class="card-img-top flagged_img" hidden="false" src="${product.image_url}" alt="Card image cap">
+                            <div class="card-body">
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
+                                <p class="card-text">${flagged_ings_string}</p>
+                            </div>
+                            <a href="${product.sephora_url}">
+                                <div class="card-footer">
+                                    <small class="text-muted">Buy from Sephora for $${product.price} ></small>
+                                </div>
+                            </a>
+                        </div>`;
+                } else {
+                    prods_card_string_3 += 
+                        `<div class="card" id="${product.pr_name}">
+                            <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
+                            <div class="card-body">
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
+                                <p class="card-text">${flagged_ings_string}</p>
+                            </div>
+                            <a href="${product.sephora_url}">
+                                <div class="card-footer">
+                                    <small class="text-muted">Buy from Sephora for $${product.price} ></small>
+                                </div>
+                            </a>
+                        </div>`;
+                };
+            };
+            for (let product of prods.slice(15, 20)) {
+                let flagged_ings_string = "";
+                for (let flag in product.enabled_flag_ings) {
+                    flagged_ings_string += `${flag}: ${product.enabled_flag_ings[flag]}`
+                };
+                if (flagged_ings_string != "") {
+                    prods_card_string_4 += 
+                        `<div class="card flagged" id="${product.pr_name}">
+                            <img class="card-img-top flagged_img" hidden="false" src="${product.image_url}" alt="Card image cap">
+                            <div class="card-body">
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
+                                <p class="card-text">${flagged_ings_string}</p>
+                            </div>
+                            <a href="${product.sephora_url}">
+                                <div class="card-footer">
+                                    <small class="text-muted">Buy from Sephora for $${product.price} ></small>
+                                </div>
+                            </a>
+                        </div>`;
+                } else {
+                    prods_card_string_4 += 
+                        `<div class="card" id="${product.pr_name}">
+                            <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
+                            <div class="card-body">
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
+                                <p class="card-text">${flagged_ings_string}</p>
+                            </div>
+                            <a href="${product.sephora_url}">
+                                <div class="card-footer">
+                                    <small class="text-muted">Buy from Sephora for $${product.price} ></small>
+                                </div>
+                            </a>
+                        </div>`;
+                };
+            };
+            for (let product of prods.slice(20, 25)) {
+                let flagged_ings_string = "";
+                for (let flag in product.enabled_flag_ings) {
+                    flagged_ings_string += `${flag}: ${product.enabled_flag_ings[flag]}`
+                };
+                if (flagged_ings_string != "") {
+                    prods_card_string_5 += 
+                        `<div class="card flagged" id="${product.pr_name}">
+                            <img class="card-img-top flagged_img" hidden="false" src="${product.image_url}" alt="Card image cap">
+                            <div class="card-body">
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
+                                <p class="card-text">${flagged_ings_string}</p>
+                            </div>
+                            <a href="${product.sephora_url}">
+                                <div class="card-footer">
+                                    <small class="text-muted">Buy from Sephora for $${product.price} ></small>
+                                </div>
+                            </a>
+                        </div>`;
+                } else {
+                    prods_card_string_5 += 
+                        `<div class="card" id="${product.pr_name}">
+                            <img class="card-img-top" src="${product.image_url}" alt="Card image cap">
+                            <div class="card-body">
+                                <h5 class="card-title">${product.brand}: ${product.pr_name} / ${product.product_id}</h5>
+                                <p class="card-text">${flagged_ings_string}</p>
+                            </div>
+                            <a href="${product.sephora_url}">
+                                <div class="card-footer">
+                                    <small class="text-muted">Buy from Sephora for $${product.price} ></small>
+                                </div>
+                            </a>
+                        </div>`;
+                };
+            };
+            $("#prod_cards_1").html(prods_card_string_1);
+            $("#prod_cards_2").html(prods_card_string_2);
+            $("#prod_cards_3").html(prods_card_string_3);
+            $("#prod_cards_4").html(prods_card_string_4);
+            $("#prod_cards_5").html(prods_card_string_5);
+            // $("#prod_cards_6").html(prods_card_string_6);      
+        };
+
+        function submitCat(evt) {
+            evt.preventDefault();
+
+            let id = "";
+            let type = "Category";
+            id = $(this).attr("id");
+
+            let inputs = {
+                "id": id,
+                "type": type,
+            };
+
+            $.post('/return_products.json', 
+                   inputs, 
+                   renderFullPageProds);
+        };
+        
+        function submitBrand(evt) {
+            evt.preventDefault();
+
+            let id = "";
+            let type = "Brand";
+            id = $(this).attr("id");
+
+            let inputs = {
+                "id": id,
+                "type": type,
+            };
+
+            $.post('/return_products.json', 
+                   inputs, 
+                   renderFullPageProds);
+        };
+
+        function submitIng(evt) {
+            evt.preventDefault();
+
+            let id = "";
+            let type = "Ingredient";
+            id = $(this).attr("id");
+
+            let inputs = {
+                "id": id,
+                "type": type,
+            };
+
+            $.post('/return_products.json', 
+                   inputs, 
+                   renderFullPageProds); 
+        };
+
+        function submitProdOne(evt) {
+            evt.preventDefault();
+
+            let id = "";
+            id = $("#card_deck_prods").children(".card").attr("id");
+
+            let inputs = {
+                "prod_one": id,
+            };
+
+            $.post('/return_products_prod.json', 
+                   inputs, 
+                   renderFullPageProds);
+        };
+
+    </script>
+
+
+{% endblock %}

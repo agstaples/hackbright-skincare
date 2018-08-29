@@ -17,8 +17,12 @@ def search_by_term(user_query):
     ingredient_choices = []
 
     # create and dedupe lists of choices for fuzzy search to compare user query against
+    product_aggregate_lookup = {}
+
     for product in products_all:
-        product_choices.append(product.pr_name)
+        # product_choices.append(product.pr_name)
+        product_choices.append(product.pr_name +" "+ product.brand +" "+ product.category)
+        product_aggregate_lookup[product.pr_name +" "+ product.brand +" "+ product.category] = product.pr_name
         brand_choices_dup.append(product.brand)
         category_choices_dup.append(product.category)
         brand_choices = list(set(brand_choices_dup))
@@ -27,7 +31,9 @@ def search_by_term(user_query):
         ingredient_choices.append(ingredient.ing_name)
 
     # get match scores
-    product_matches = process.extract(user_query, product_choices, scorer=fuzz.partial_ratio, limit = 20) 
+    # product_matches = process.extract(user_query, product_choices, scorer=fuzz.partial_ratio, limit = 20) 
+    # product_matches = process.extract(user_query, product_choices, scorer=fuzz.ratio, limit = 20)
+    product_matches = process.extract(user_query, product_choices, scorer=fuzz.partial_ratio, limit = 20)  
     brand_matches = process.extract(user_query, brand_choices, scorer=fuzz.partial_ratio, limit = 10) 
     category_matches = process.extract(user_query, category_choices, scorer=fuzz.partial_ratio) 
     ingredient_matches = process.extract(user_query, ingredient_choices, scorer=fuzz.ratio, limit = 15)
@@ -50,7 +56,8 @@ def search_by_term(user_query):
     products = []
     if product_matches:
         for product in product_matches:
-            prods = products_all.filter(Product.pr_name == product[0]).all()
+            product_extract = product_aggregate_lookup[product[0]]
+            prods = products_all.filter(Product.pr_name == product_extract).all()
             for prod in prods:
                 if prod not in products:
                     products.append(prod)

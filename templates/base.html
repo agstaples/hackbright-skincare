@@ -19,34 +19,40 @@
 <body onload="askServer()">
     <div id="full-bg"></div>
     {% block navbar %}
-    <div id="navbar" style="display:none">
+    <div id="navbar">
         <nav class="navbar navbar-expand-md transparent" id="nav_main">
-            <a class="navbar-brand" href="#" style="font-family: 'Montserrat Alternates'; color:#9793a9; font-size:40px; font-weight:bold; padding-top:10px">Gadget</a>
-            <img id="logo_btn" src="static/gadget.png" width="55px" height="70px" style="margin-left:-20px"/>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand" hidden="true" href="#" style="font-family: 'Montserrat Alternates'; color:#9793a9; font-size:40px; font-weight:bold; padding-top:10px">Gadget</a>
+            <img id="logo_btn" hidden="true" src="static/gadget.png" width="55px" height="70px" style="margin-left:-20px"/>
+            <button class="navbar-toggler" hidden="true" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
                 <ul class="navbar-nav ml-auto">
-                    
-                    <li>
-                        <form action="/search_results.json" method="POST" id="search_form" class="form-inline my-2 my-lg-0">
-                        <input class="form-control mr-sm-2" type="search" placeholder="" aria-label="Search" id="user_search">
-                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id="user_search_btn">Search</button>
-                        </form>
-                    </li>
-                        <button class="btn btn-outline-success my-2 my-sm-0" type="button" id="navbar_log_in_out_btn" hidden="false">Sign In</button>
-                    <li>
-
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Flags</a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" id="create_flag" href="#">Create Custom Flag</a>
-                            <a class="dropdown-item" id="edit_flag" href="#">Edit Custom Flag</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" id="disable_enable_flag" href="#">Disable/Enable Flag</a>
-                        </div>
-                    </li>
+                    <div class="navbar_search" style="display:none">
+<!--                     <div class="navbar_search"> -->
+                        <li>
+                            <form action="/search_results.json" method="POST" id="search_form" class="form-inline my-2 my-lg-0">
+                            <input class="form-control mr-sm-2" type="search" placeholder="" aria-label="Search" id="user_search">
+                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id="user_search_btn">Search</button>
+                            </form>
+                        </li>
+                    </div>
+                    <div class="flag_dropdown">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Flags</a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" id="create_flag" href="#">Create Custom Flag</a>
+                                <a class="dropdown-item" id="edit_flag" href="#">Edit Custom Flag</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" id="disable_enable_flag" href="#">Disable/Enable Flag</a>
+                            </div>
+                        </li>
+                    </div>
+                    <div>
+                        <li>
+                            <button class="btn btn-link my-2 my-sm-0" type="button" id="navbar_log_in_out_btn" >Sign In</button>
+                        </li>
+                    </div>
                 </ul>
             </div>
         </nav>
@@ -293,7 +299,6 @@
                 $("#navbar_log_in_out_btn").html("Sign In");
             } else {
                 $("#navbar_log_in_out_btn").html("Sign Out");
-                $("#navbar_log_in_out_btn").attr("hidden", true);
             };
         };
         
